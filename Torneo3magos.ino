@@ -56,7 +56,6 @@ bool pulsadoresPresionados[4] = {false, false, false, false};
 unsigned long ultimosTiemposPulsadores[4] = {0, 0, 0, 0};
 const unsigned long debounceDelay = 120;
 
-#define PWM_PIN 12
 
 // Variables para el manejo del audio
 AudioGeneratorMP3 *mp3;
@@ -72,7 +71,7 @@ const int preguntasPorJuego = 5;
 int preguntasSeleccionadas[preguntasPorJuego];
 int preguntaActual = 0;
 int respuestasCorrectas = 0;
-
+int ordenOpciones[4];
 // Variables para el control de los servomotores
 unsigned long ultimoMovimientoCuspide = 0;
 unsigned long ultimoMovimientoBoca = 0;
@@ -183,6 +182,11 @@ void seleccionarPreguntasAleatorias() {
 }
 
 void verificarRespuestaPregunta() {
+  if (!yaReprodujo) {
+    reproducirOpciones();
+    return;
+  }
+
   for (int i = 0; i < 4; i++) {
     int lectura = digitalRead(PIN_BOTON_1 + i);
     unsigned long tiempoActual = millis();
@@ -191,30 +195,19 @@ void verificarRespuestaPregunta() {
       pulsadoresPresionados[i] = true;
       ultimosTiemposPulsadores[i] = tiempoActual;
       
-      // Verificar si la respuesta es correcta (suponemos que la respuesta correcta está en un archivo)
-      char rutaRespuestaCorrecta[50];
-      snprintf(rutaRespuestaCorrecta, sizeof(rutaRespuestaCorrecta), "/rubro%d/pregunta%d_respuesta.txt", rubroSeleccionado + 1, preguntasSeleccionadas[preguntaActual]);
-      
-      File archivoRespuesta = SD.open(rutaRespuestaCorrecta);
-      if (archivoRespuesta) {
-        int respuestaCorrecta = archivoRespuesta.parseInt();
-        archivoRespuesta.close();
-        
-        if (i + 1 == respuestaCorrecta) {
-          respuestasCorrectas++;
-          LedPWM(0, 255, 0); // Verde para respuesta correcta
-          reproducirAudio("/correcta.mp3");
-        } else {
-          LedPWM(255, 0, 0); // Rojo para respuesta incorrecta
-          reproducirAudio("/incorrecta.mp3");
-        }
+      // Verificar si la respuesta es correcta
+      if (ordenOpciones[i] == 0) { // La opción 1 (índice 0) siempre es la correcta
+        respuestasCorrectas++;
+        LedPWM(0, 255, 0); // Verde para respuesta correcta
+        reproducirAudio("/correcta.mp3");
       } else {
-        Serial.println("Error al abrir el archivo de respuesta");
+        LedPWM(255, 0, 0); // Rojo para respuesta incorrecta
+        reproducirAudio("/incorrecta.mp3");
       }
       
       preguntaActual++;
       if (preguntaActual < preguntasPorJuego) {
-        reproducirPregunta(preguntaActual);
+        yaReprodujo = false; // Preparar para reproducir la siguiente pregunta y opciones
       }
     } else if (lectura == HIGH) {
       pulsadoresPresionados[i] = false;
@@ -226,6 +219,39 @@ void reproducirPregunta(int numeroPregunta) {
   char rutaPregunta[50];
   snprintf(rutaPregunta, sizeof(rutaPregunta), "/rubro%d/pregunta%d.mp3", rubroSeleccionado + 1, preguntasSeleccionadas[numeroPregunta]);
   reproducirAudio(rutaPregunta);
+  yaReprodujo = false; // Preparar para reproducir las opciones
+}
+
+void reproducirOpciones() {
+  // Generar orden aleatorio de opciones
+  for (int i = 0; i < 4; i++) {
+    ordenOpciones[i] = i;
+  }
+  for (int i = 3; i > 0; i--) {
+    int j = random(0, i + 1);
+    int temp = ordenOpciones[i];
+    ordenOpciones[i] = ordenOpciones[j];
+    ordenOpciones[j] = temp;
+  }
+
+  // Reproducir opciones en orden aleatorio
+  for (int i = 0; i < 4; i++) {
+    char rutaOpcion[50];
+    snprintf(rutaOpcion, sizeof(rutaOpcion), "/rubro%d/pregunta%d_opcion%d.mp3", 
+             rubroSeleccionado + 1, preguntasSeleccionadas[preguntaActual], ordenOpciones[i] + 1);
+    reproducirAudio(rutaOpcion);
+    while (mp3->isRunning()) {
+      if (!mp3->loop()) {
+        mp3->stop();
+        fuente->close();
+        break;
+      }
+      moverServoCuspide();
+      moverServoBoca();
+    }
+    delay(500); // Pequeña pausa entre opciones
+  }
+  yaReprodujo = true;
 }
 
 void finalizarJuego() {
