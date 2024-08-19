@@ -27,26 +27,33 @@ Este proyecto implementa un juego de trivia interactivo llamado "Torneo de los 3
 # Trivia de los 3 Magos
 
 ## Diagrama de Conexiones
+![image](https://github.com/user-attachments/assets/597339be-300b-4c1d-8eef-6322132b2525)
 
-graph TD
-    ESP32[ESP32] --> |PIN 18| SD_SCK[SD Card SCK]
-    ESP32 --> |PIN 19| SD_MISO[SD Card MISO]
-    ESP32 --> |PIN 23| SD_MOSI[SD Card MOSI]
-    ESP32 --> |PIN 5| SD_CS[SD Card CS]
-    
-    ESP32 --> |PIN 4| BOTON1[Botón 1]
-    ESP32 --> |PIN 15| BOTON2[Botón 2]
-    ESP32 --> |PIN 34| BOTON3[Botón 3]
-    ESP32 --> |PIN 35| BOTON4[Botón 4]
-    
-    ESP32 --> |PIN 13| SERVO[Servo Tapa]
-    
-    ESP32 --> |PIN 25| LED_R[LED RGB - Rojo]
-    ESP32 --> |PIN 26| LED_G[LED RGB - Verde]
-    ESP32 --> |PIN 27| LED_B[LED RGB - Azul]
-    
-    ESP32 --> |I2S| DAC[DAC para Audio]
+Conexiones y Pines:
 
+- **ESP32**
+  - |PIN 18| [SD_SCK (SD Card SCK)]
+  - |PIN 19| [SD_MISO (SD Card MISO)]
+  - |PIN 23| [SD_MOSI (SD Card MOSI)]
+  - |PIN 5| [SD_CS (SD Card CS)]
+  
+- **Botones**
+  - |PIN 4| [BOTON1 (Botón 1)]
+  - |PIN 15| [BOTON2 (Botón 2)]
+  - |PIN 34| [BOTON3 (Botón 3)]
+  - |PIN 35| [BOTON4 (Botón 4)]
+  
+- **Sensores y actuadores**
+  - |PIN 13| [SERVO (Servo Tapa)]
+    
+- **LEDs RGB**
+  - |PIN 25| [LED_R (RGB Rojo)]
+  - |PIN 26| [LED_G (RGB Verde)]
+  - |PIN 27| [LED_B (RGB Azul)]
+  
+- **Audio**
+  - |I2S_PIN22| [DAC (DAC para Audio)]
+```
 ## Configuración del Proyecto
 
 1. Asegúrese de tener instaladas las siguientes bibliotecas:
