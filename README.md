@@ -1,3 +1,5 @@
+Ciertamente, generaré la documentación en formato Markdown compatible con GitHub para el código adjunto. Incluiré un diagrama de conexiones y una explicación detallada de cada función.
+
 # Documentación: Torneo de los 3 Magos
 
 ## Índice
@@ -21,10 +23,6 @@ Este proyecto implementa un juego de trivia interactivo llamado "Torneo de los 3
 - LED RGB
 - Servomotor
 - Altavoz (salida de audio I2S)
-
-## Diagrama de Conexiones
-
-# Trivia de los 3 Magos
 
 ## Diagrama de Conexiones
 ![image](https://github.com/user-attachments/assets/597339be-300b-4c1d-8eef-6322132b2525)
@@ -53,7 +51,7 @@ Conexiones y Pines:
   
 - **Audio**
   - |I2S_PIN22| [DAC (DAC para Audio)]
-```
+
 ## Configuración del Proyecto
 
 1. Asegúrese de tener instaladas las siguientes bibliotecas:
@@ -152,5 +150,3 @@ Para habilitar las actualizaciones Over-The-Air:
 1. Asegúrese de que `OTAhabilitado` esté configurado como `true`.
 2. Configure las credenciales WiFi correctas en `ssid` y `password`.
 3. El dispositivo se conectará a la red WiFi durante el inicio y estará disponible para actualizaciones OTA.
-
-¿Le gustaría que profundice en algún aspecto específico de la documentación o que añada alguna información adicional?
