@@ -1,6 +1,4 @@
-Ciertamente, generaré la documentación en formato Markdown compatible con GitHub para el código adjunto. Incluiré un diagrama de conexiones y una explicación detallada de cada función.
-
-# Documentación: Torneo de los 3 Magos
+# Torneo de los 3 Magos
 
 ## Índice
 1. [Descripción General](#descripción-general)
