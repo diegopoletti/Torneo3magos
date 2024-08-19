@@ -1,4 +1,4 @@
-const char *version = "1.00"; // Versión del programa 
+const char *version = "1.01"; // Versión del programa 
 // Adaptación para la Trivia de los 3 Magos
 
 #include "AudioFileSourceSD.h"
@@ -29,9 +29,8 @@ const char *password = "";
 #define PIN_BOTON_3 34
 #define PIN_BOTON_4 35
 
-// Pines para los servomotores
-#define PIN_SERVO_CUSPIDE 13
-#define PIN_SERVO_BOCA 14
+// Pin para el servomotor
+#define PIN_SERVO_TAPA 13
 
 // Pines para LED RGB
 #define PIN_LED_ROJO 25
@@ -45,9 +44,8 @@ const char *password = "";
 #define LEDC_TIMER_8_BIT 8
 #define FRECUENCIA_BASE_LEDC 5000
 
-// Objetos Servo
-Servo servoCuspide;
-Servo servoBoca;
+// Objeto Servo
+Servo servoTapa;
 
 bool pulsadorPresionado = false;
 
@@ -56,7 +54,6 @@ bool pulsadoresPresionados[4] = {false, false, false, false};
 unsigned long ultimosTiemposPulsadores[4] = {0, 0, 0, 0};
 const unsigned long debounceDelay = 120;
 
-
 // Variables para el manejo del audio
 AudioGeneratorMP3 *mp3;
 AudioFileSourceSD *fuente;
@@ -64,19 +61,22 @@ AudioOutputI2SNoDAC *salida;
 bool yaReprodujo = false;
 
 // Variables para el manejo de la lógica del cuestionario
-int rubroSeleccionado = -1;
-const int totalRubros = 4;
-const int preguntasPorRubro = 30;
+int categoriaSeleccionada = -1;
+const int totalCategorias = 4;
+const int preguntasPorCategoria = 30;
 const int preguntasPorJuego = 5;
 int preguntasSeleccionadas[preguntasPorJuego];
 int preguntaActual = 0;
 int respuestasCorrectas = 0;
 int ordenOpciones[4];
-// Variables para el control de los servomotores
-unsigned long ultimoMovimientoCuspide = 0;
-unsigned long ultimoMovimientoBoca = 0;
-const int intervaloMovimientoCuspide = 500;
-const int intervaloMovimientoBoca = 100;
+
+// Variable para el tiempo límite de respuesta
+const unsigned long tiempoLimiteRespuesta = 30000; // 30 segundos, configurable
+unsigned long tiempoInicioPregunta;
+
+// Variables para el control del servomotor
+unsigned long ultimoMovimientoTapa = 0;
+const int intervaloMovimientoTapa = 500;
 
 void setup() {
   Serial.begin(115200);
@@ -95,11 +95,8 @@ void setup() {
   pinMode(PIN_BOTON_4, INPUT_PULLUP);
   
   ESP32PWM::allocateTimer(0);
-  ESP32PWM::allocateTimer(1);
-  servoCuspide.setPeriodHertz(50);
-  servoBoca.setPeriodHertz(50);
-  servoCuspide.attach(PIN_SERVO_CUSPIDE, 500, 2400);
-  servoBoca.attach(PIN_SERVO_BOCA, 500, 2400);
+  servoTapa.setPeriodHertz(50);
+  servoTapa.attach(PIN_SERVO_TAPA, 500, 2400);
 
   configurarLED();
 
@@ -109,7 +106,7 @@ void setup() {
   salida->SetOutputModeMono(true);
 
   if (OTAhabilitado)
-    initOTA();
+    iniciarOTA();
   
   reproducirIntroduccion();
 }
@@ -126,25 +123,27 @@ void loop() {
       fuente->close();
       Serial.println("Audio Stop");
       Serial.println("Archivo Cerrado");
-      servoCuspide.write(90);
-      servoBoca.write(90);
+      servoTapa.write(90);
       yield();
     } else {
-      moverServoCuspide();
-      moverServoBoca();
+      moverServoTapa();
     }
   } else {
-    if (rubroSeleccionado == -1) {
-      verificarSeleccionRubro();
+    if (categoriaSeleccionada == -1) {
+      verificarSeleccionCategoria();
     } else if (preguntaActual < preguntasPorJuego) {
-      verificarRespuestaPregunta();
+      if (!yaReprodujo) {
+        reproducirPregunta(preguntaActual);
+      } else {
+        verificarRespuestaPregunta();
+      }
     } else {
       finalizarJuego();
     }
   }
 }
 
-void verificarSeleccionRubro() {
+void verificarSeleccionCategoria() {
   for (int i = 0; i < 4; i++) {
     int lectura = digitalRead(PIN_BOTON_1 + i);
     unsigned long tiempoActual = millis();
@@ -152,9 +151,9 @@ void verificarSeleccionRubro() {
     if (lectura == LOW && !pulsadoresPresionados[i] && (tiempoActual - ultimosTiemposPulsadores[i] > debounceDelay)) {
       pulsadoresPresionados[i] = true;
       ultimosTiemposPulsadores[i] = tiempoActual;
-      rubroSeleccionado = i;
-      Serial.print("Rubro seleccionado: ");
-      Serial.println(rubroSeleccionado);
+      categoriaSeleccionada = i;
+      Serial.print("Categoría seleccionada: ");
+      Serial.println(categoriaSeleccionada);
       seleccionarPreguntasAleatorias();
       reproducirPregunta(preguntaActual);
     } else if (lectura == HIGH) {
@@ -168,7 +167,7 @@ void seleccionarPreguntasAleatorias() {
     bool preguntaUnica;
     int nuevaPregunta;
     do {
-      nuevaPregunta = random(1, preguntasPorRubro + 1);
+      nuevaPregunta = random(1, preguntasPorCategoria + 1);
       preguntaUnica = true;
       for (int j = 0; j < i; j++) {
         if (preguntasSeleccionadas[j] == nuevaPregunta) {
@@ -182,14 +181,18 @@ void seleccionarPreguntasAleatorias() {
 }
 
 void verificarRespuestaPregunta() {
-  if (!yaReprodujo) {
-    reproducirOpciones();
+  unsigned long tiempoActual = millis();
+  
+  if (tiempoActual - tiempoInicioPregunta >= tiempoLimiteRespuesta) {
+    // Tiempo agotado, marcar como incorrecta y avanzar
+    LedPWM(255, 0, 0); // Rojo para respuesta incorrecta
+    reproducirAudio("/incorrecta.mp3");
+    avanzarSiguientePregunta();
     return;
   }
 
   for (int i = 0; i < 4; i++) {
     int lectura = digitalRead(PIN_BOTON_1 + i);
-    unsigned long tiempoActual = millis();
     
     if (lectura == LOW && !pulsadoresPresionados[i] && (tiempoActual - ultimosTiemposPulsadores[i] > debounceDelay)) {
       pulsadoresPresionados[i] = true;
@@ -205,21 +208,27 @@ void verificarRespuestaPregunta() {
         reproducirAudio("/incorrecta.mp3");
       }
       
-      preguntaActual++;
-      if (preguntaActual < preguntasPorJuego) {
-        yaReprodujo = false; // Preparar para reproducir la siguiente pregunta y opciones
-      }
+      avanzarSiguientePregunta();
+      return;
     } else if (lectura == HIGH) {
       pulsadoresPresionados[i] = false;
     }
   }
 }
 
+void avanzarSiguientePregunta() {
+  preguntaActual++;
+  if (preguntaActual < preguntasPorJuego) {
+    yaReprodujo = false; // Preparar para reproducir la siguiente pregunta y opciones
+  }
+}
+
 void reproducirPregunta(int numeroPregunta) {
   char rutaPregunta[50];
-  snprintf(rutaPregunta, sizeof(rutaPregunta), "/rubro%d/pregunta%d.mp3", rubroSeleccionado + 1, preguntasSeleccionadas[numeroPregunta]);
+  snprintf(rutaPregunta, sizeof(rutaPregunta), "/categoria%d/pregunta%d.mp3", categoriaSeleccionada + 1, preguntasSeleccionadas[numeroPregunta]);
   reproducirAudio(rutaPregunta);
   yaReprodujo = false; // Preparar para reproducir las opciones
+  tiempoInicioPregunta = millis(); // Iniciar el temporizador para la pregunta
 }
 
 void reproducirOpciones() {
@@ -237,8 +246,8 @@ void reproducirOpciones() {
   // Reproducir opciones en orden aleatorio
   for (int i = 0; i < 4; i++) {
     char rutaOpcion[50];
-    snprintf(rutaOpcion, sizeof(rutaOpcion), "/rubro%d/pregunta%d_opcion%d.mp3", 
-             rubroSeleccionado + 1, preguntasSeleccionadas[preguntaActual], ordenOpciones[i] + 1);
+    snprintf(rutaOpcion, sizeof(rutaOpcion), "/categoria%d/pregunta%d_opcion%d.mp3", 
+             categoriaSeleccionada + 1, preguntasSeleccionadas[preguntaActual], ordenOpciones[i] + 1);
     reproducirAudio(rutaOpcion);
     while (mp3->isRunning()) {
       if (!mp3->loop()) {
@@ -246,8 +255,7 @@ void reproducirOpciones() {
         fuente->close();
         break;
       }
-      moverServoCuspide();
-      moverServoBoca();
+      moverServoTapa();
     }
     delay(500); // Pequeña pausa entre opciones
   }
@@ -269,7 +277,7 @@ void finalizarJuego() {
   reproducirAudio(archivoResultado);
   
   // Reiniciar variables para un nuevo juego
-  rubroSeleccionado = -1;
+  categoriaSeleccionada = -1;
   preguntaActual = 0;
   respuestasCorrectas = 0;
 }
@@ -294,8 +302,7 @@ void reproducirAudio(const char *ruta) {
   mp3->begin(fuente, salida);
   yaReprodujo = true;
   
-  moverServoCuspide();
-  moverServoBoca();
+  moverServoTapa();
 }
 
 void configurarLED() {
@@ -314,7 +321,7 @@ void LedPWM(int rojo, int verde, int azul) {
   ledcWrite(CANAL_LEDC_2, azul);
 }
 
-void initOTA() {
+void iniciarOTA() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -327,20 +334,11 @@ void initOTA() {
   ArduinoOTA.begin();
 }
 
-void moverServoCuspide() {
+void moverServoTapa() {
   unsigned long tiempoActual = millis();
-  if (tiempoActual - ultimoMovimientoCuspide >= intervaloMovimientoCuspide) {
+  if (tiempoActual - ultimoMovimientoTapa >= intervaloMovimientoTapa) {
     int posicion = random(70, 111);
-    servoCuspide.write(posicion);
-    ultimoMovimientoCuspide = tiempoActual;
-  }
-}
-
-void moverServoBoca() {
-  unsigned long tiempoActual = millis();
-  if (tiempoActual - ultimoMovimientoBoca >= intervaloMovimientoBoca) {
-    int posicion = random(80, 101);
-    servoBoca.write(posicion);
-    ultimoMovimientoBoca = tiempoActual;
+    servoTapa.write(posicion);
+    ultimoMovimientoTapa = tiempoActual;
   }
 }
