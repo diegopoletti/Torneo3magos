@@ -1,4 +1,4 @@
-const char *version = "1.01"; // Versión del programa 
+const char *version = "1.02"; // Versión del programa 
 // Adaptación para la Trivia de los 3 Magos
 
 #include "AudioFileSourceSD.h" // Incluye la biblioteca para manejar archivos de audio desde la tarjeta SD
@@ -9,7 +9,7 @@ const char *version = "1.01"; // Versión del programa
 #include "SPI.h" // Incluye la biblioteca para la comunicación SPI
 #include <WiFi.h> // Incluye la biblioteca para conectividad WiFi
 #include <ArduinoOTA.h> // Incluye la biblioteca para actualizaciones OTA (Over-The-Air)
-#include <ESP32Servo.h> // Incluye la biblioteca para controlar servomotores
+//#include <ESP32Servo.h> // Incluye la biblioteca para controlar servomotores
 
 bool OTAhabilitado = false; // Variable para habilitar o deshabilitar actualizaciones OTA
 
@@ -29,9 +29,9 @@ const char *password = ""; // Contraseña de la red WiFi
 #define PIN_BOTON_3 34 // Pin para el tercer pulsador
 #define PIN_BOTON_4 35 // Pin para el cuarto pulsador
 
-// Pin para el servomotor
-#define PIN_SERVO_TAPA 13 // Pin para controlar el servomotor que abre/cierra la tapa
-
+// Pin para el motor Ventilador
+#define PIN_FUEGO 13 // Pin para controlar el Ventilador del Fuego
+#define CANAL_LEDC_3 3 // Canal para el PWM del Ventilador de Fuego
 // Pines para LED RGB
 #define PIN_LED_ROJO 25 // Pin para el LED rojo
 #define PIN_LED_VERDE 26 // Pin para el LED verde
@@ -42,10 +42,9 @@ const char *password = ""; // Contraseña de la red WiFi
 #define CANAL_LEDC_2 2 // Canal para el LED azul
 
 #define LEDC_TIMER_8_BIT 8 // Resolución del temporizador LEDC
-#define FRECUENCIA_BASE_LEDC 5000 // Frecuencia base para el control de los LEDs
+#define FRECUENCIA_BASE_LEDC 5000 // Frecuencia base para el control de los LEDs y Ventilador
 
 // Objeto Servo
-Servo servoTapa; // Crea un objeto servo para controlar la tapa
 bool pulsadorPresionado = false; // Variable para verificar si un pulsador ha sido presionado
 
 // Variables para el estado de los pulsadores y manejo del debounce
@@ -73,10 +72,9 @@ int ordenOpciones[4]; // Arreglo que guarda el orden de las opciones de respuest
 const unsigned long tiempoLimiteRespuesta = 30000; // 30 segundos, configurable
 unsigned long tiempoInicioPregunta; // Variable que guarda el tiempo de inicio de la pregunta
 
-// Variables para el control del servomotor
-unsigned long ultimoMovimientoTapa = 0; // Tiempo del último movimiento del servomotor
-const int intervaloMovimientoTapa = 500; // Intervalo de tiempo entre movimientos del servomotor
-
+// Variables para el control del motor del ventilador que simula el fuego (ver función MoverFuego)
+unsigned long ultimoMovimientoFuego = 0; // Tiempo del último movimiento del servomotor
+const int intervaloMovimientoFuego = 200; // Intervalo de tiempo entre movimientos de velocidad del fuego
 void setup() {
   Serial.begin(115200); // Inicializa la comunicación serial a 115200 baudios
   Serial.println(version); // Imprime la versión del programa en el monitor serial
@@ -93,9 +91,7 @@ void setup() {
   pinMode(PIN_BOTON_3, INPUT_PULLUP); // Configura el tercer botón como entrada con resistencia pull-up
   pinMode(PIN_BOTON_4, INPUT_PULLUP); // Configura el cuarto botón como entrada con resistencia pull-up
   
-  ESP32PWM::allocateTimer(0); // Asigna un temporizador para el control de PWM
-  servoTapa.setPeriodHertz(50); // Establece la frecuencia del servomotor a 50 Hz
-  servoTapa.attach(PIN_SERVO_TAPA, 500, 2400); // Conecta el servomotor al pin especificado con rango de pulso
+//  ESP32PWM::allocateTimer(0); // Asigna un temporizador para el control de PWM
 
   configurarLED(); // Llama a la función para configurar el LED
 
@@ -115,7 +111,7 @@ void loop() {
   
   // Captura el tiempo actual en milisegundos
   unsigned long tiempoActual = millis();
-
+     moverFuego(); // Llama a la función para cambiar la velocidad de movimiento del ventilador simulación de fuego
   // Comprueba si el reproductor de MP3 está en funcionamiento
   if (mp3->isRunning()) {
     // Si el MP3 no está en bucle y ya se reprodujo, detiene la reproducción
@@ -125,10 +121,12 @@ void loop() {
       fuente->close(); // Cierra la fuente de audio
       Serial.println("Audio Stop"); // Imprime en el monitor serie que el audio se detuvo
       Serial.println("Archivo Cerrado"); // Imprime que el archivo se cerró
-      servoTapa.write(90); // Mueve el servo a la posición 90 grados
       yield(); // Libera el procesador para otras tareas
     } else {
-      moverServoTapa(); // Llama a la función para mover la tapa del servo
+      // Verifica si la OTA está habilitada y maneja la actualización, de lo contrario, libera el procesador
+      OTAhabilitado ? ArduinoOTA.handle() : yield();
+      yield(); //libera los recursos para otras funciones del dispocitivo
+   
     }
   } else {
     // Si no hay un MP3 en ejecución, verifica la categoría seleccionada
@@ -268,9 +266,10 @@ void reproducirOpciones() {
         fuente->close(); // Cerrar la fuente de audio
         break; // Salir del bucle
       }
-      moverServoTapa(); // Mover el servo de la tapa
+      moverFuego(); // Mover la velocidad del fuego
     }
     delay(500); // Pequeña pausa entre opciones
+    moverFuego(); // Mover la velocidad del fuego
   }
   yaReprodujo = true; // Indicar que se han reproducido todas las opciones
 }
@@ -301,12 +300,14 @@ void reproducirIntroduccion() {
 
 void reproducirAudio(const char *ruta) {
   if (!SD.exists(ruta)) { // Verifica si el archivo existe en la tarjeta SD
-    Serial.println("Archivo no encontrado"); // Mensaje de error si no se encuentra el archivo
+    Serial.print("Archivo no encontrado: "); // Mensaje de error si no se encuentra el archivo
+    Serial.println(ruta); // archivo
     return; // Sale de la función si el archivo no existe
   }
 
   if (!fuente->open(ruta)) { // Intenta abrir el archivo de audio
-    Serial.println("Error al abrir el archivo"); // Mensaje de error si no se puede abrir el archivo
+    Serial.print("Error al abrir el archivo: "); // Mensaje de error si no se puede abrir el archivo
+    Serial.println(ruta); // archivo
     return; // Sale de la función si hay un error al abrir el archivo
   }
 
@@ -314,8 +315,7 @@ void reproducirAudio(const char *ruta) {
   mp3->begin(fuente, salida); // Inicia la reproducción del archivo de audio
   yaReprodujo = true; // Marca que ya se ha reproducido el audio
   
-  moverServoTapa(); // Llama a la función para mover el servo de la tapa
-}
+ }
 
 void configurarLED() {
   ledcSetup(CANAL_LEDC_0, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT); // Configura el canal LEDC 0
@@ -346,11 +346,11 @@ void iniciarOTA() {
   ArduinoOTA.begin(); // Inicia el proceso de OTA
 }
 
-void moverServoTapa() {
+void moverFuego() {
   unsigned long tiempoActual = millis(); // Obtiene el tiempo actual en milisegundos
-  if (tiempoActual - ultimoMovimientoTapa >= intervaloMovimientoTapa) { // Verifica si ha pasado el intervalo
-    int posicion = random(70, 111); // Genera una posición aleatoria para el servo
-    servoTapa.write(posicion); // Mueve el servo a la posición generada
-    ultimoMovimientoTapa = tiempoActual; // Actualiza el tiempo del último movimiento
+  if (tiempoActual - ultimoMovimientoFuego >= intervaloMovimientoFuego) { // Verifica si ha pasado el intervalo
+    int velocidad = random(144, 254); // Genera un cambio de velocidad aleatorio para simular un movimiento de fuego
+    ledcWrite(CANAL_LEDC_3, velocidad); // Escribe el valor del LED azul
+    ultimoMovimientoFuego = tiempoActual; // Actualiza el tiempo del último movimiento
   }
 }
