@@ -44,7 +44,7 @@ const char *password = ""; // Contraseña de la red WiFi
 #define LEDC_TIMER_8_BIT 8 // Resolución del temporizador LEDC
 #define FRECUENCIA_BASE_LEDC 5000 // Frecuencia base para el control de los LEDs y Ventilador
 
-// Objeto Servo
+
 bool pulsadorPresionado = false; // Variable para verificar si un pulsador ha sido presionado
 
 // Variables para el estado de los pulsadores y manejo del debounce
@@ -66,11 +66,11 @@ const int preguntasPorJuego = 5; // Total de preguntas que se jugarán en una pa
 int preguntasSeleccionadas[preguntasPorJuego]; // Arreglo que guarda las preguntas seleccionadas para el juego
 int preguntaActual = 0; // Índice de la pregunta actual
 int respuestasCorrectas = 0; // Contador de respuestas correctas
-int ordenOpciones[4]; // Arreglo que guarda el orden de las opciones de respuesta
+int ordenOpciones[totalCategorias]; // Arreglo que guarda el orden de las opciones de respuesta
 
 // Variable para el tiempo límite de respuesta
 const unsigned long tiempoLimiteRespuesta = 30000; // 30 segundos, configurable
-unsigned long tiempoInicioPregunta; // Variable que guarda el tiempo de inicio de la pregunta
+unsigned long tiempoInicioPregunta = 0; // Variable que guarda el tiempo de inicio de la pregunta
 
 // Variables para el control del motor del ventilador que simula el fuego (ver función MoverFuego)
 unsigned long ultimoMovimientoFuego = 0; // Tiempo del último movimiento del servomotor
@@ -91,9 +91,8 @@ void setup() {
   pinMode(PIN_BOTON_3, INPUT_PULLUP); // Configura el tercer botón como entrada con resistencia pull-up
   pinMode(PIN_BOTON_4, INPUT_PULLUP); // Configura el cuarto botón como entrada con resistencia pull-up
   
-//  ESP32PWM::allocateTimer(0); // Asigna un temporizador para el control de PWM
-
   configurarLED(); // Llama a la función para configurar el LED
+  configurarFuego(); //Llama a la funcón para configurar el PWM del ventilador que simulará el fuego 
 
   mp3 = new AudioGeneratorMP3(); // Crea una nueva instancia del generador de audio MP3
   salida = new AudioOutputI2SNoDAC(); // Crea una nueva instancia de salida de audio I2S sin DAC
@@ -146,9 +145,11 @@ void loop() {
 }
 
 void verificarSeleccionCategoria() {
+  int PIN_BOTONES[4] = {PIN_BOTON_1, PIN_BOTON_2, PIN_BOTON_3, PIN_BOTON_4};
   // Recorre los botones para verificar la selección de categoría
   for (int i = 0; i < 4; i++) {
-    int lectura = digitalRead(PIN_BOTON_1 + i); // Lee el estado del botón
+    int lectura = digitalRead(PIN_BOTONES[i]); // Lee el estado del botón
+    Serial.print("pin a leer: "); Serial.println(PIN_BOTONES[i]);
     unsigned long tiempoActual = millis(); // Captura el tiempo actual
 
     // Verifica si el botón fue presionado y si no ha sido registrado antes
@@ -157,9 +158,10 @@ void verificarSeleccionCategoria() {
       ultimosTiemposPulsadores[i] = tiempoActual; // Actualiza el tiempo del último botón presionado
       categoriaSeleccionada = i; // Asigna la categoría seleccionada
       Serial.print("Categoría seleccionada: "); // Imprime la categoría seleccionada
-      Serial.println(categoriaSeleccionada); // Muestra el número de categoría en el monitor serie
+      Serial.println(categoriaSeleccionada + 1); // Muestra el número de categoría en el monitor serie
       seleccionarPreguntasAleatorias(); // Llama a la función para seleccionar preguntas aleatorias
       reproducirPregunta(preguntaActual); // Reproduce la pregunta actual
+      reproducirOpciones();
     } else if (lectura == HIGH) {
       pulsadoresPresionados[i] = false; // Marca el botón como no presionado
     }
@@ -197,12 +199,12 @@ void verificarRespuestaPregunta() {
     avanzarSiguientePregunta(); // Avanzar a la siguiente pregunta
     return; // Salir de la función
   }
-
+  int PIN_BOTONES[4] = {PIN_BOTON_1, PIN_BOTON_2, PIN_BOTON_3, PIN_BOTON_4};
   // Verificar las respuestas de los botones
   for (int i = 0; i < 4; i++) {
-    int lectura = digitalRead(PIN_BOTON_1 + i); // Leer el estado del botón
-    
-    // Comprobar si el botón fue presionado
+    int lectura = digitalRead(PIN_BOTONES[i]); // Lee el estado del botón
+    Serial.print("pin a leer: "); Serial.println(PIN_BOTONES[i]);
+      // Comprobar si el botón fue presionado
     if (lectura == LOW && !pulsadoresPresionados[i] && (tiempoActual - ultimosTiemposPulsadores[i] > debounceDelay)) {
       pulsadoresPresionados[i] = true; // Marcar el botón como presionado
       ultimosTiemposPulsadores[i] = tiempoActual; // Actualizar el tiempo del último botón presionado
@@ -317,6 +319,9 @@ void reproducirAudio(const char *ruta) {
   
  }
 
+/// @brief Configura los pines de LED en la placa Arduino para un Torneo de Mágicos.
+///   Este método establece las configuraciones necesarias y asocia los pines de las
+///   luces RGB (rojo, verde, azul) a los canales de LEDC para ser controladas por el sistema
 void configurarLED() {
   ledcSetup(CANAL_LEDC_0, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT); // Configura el canal LEDC 0
   ledcSetup(CANAL_LEDC_1, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT); // Configura el canal LEDC 1
@@ -345,7 +350,10 @@ void iniciarOTA() {
   ArduinoOTA.setHostname("ESP32-TriviaMagos"); // Establece el nombre del host para OTA
   ArduinoOTA.begin(); // Inicia el proceso de OTA
 }
-
+void configurarFuego() {
+  ledcSetup(CANAL_LEDC_3, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT); // Configura el canal LEDC 3 para el ventilador fuego
+  ledcAttachPin(PIN_FUEGO, CANAL_LEDC_2); // Asocia el pin del LED azul al canal LEDC 2
+}
 void moverFuego() {
   unsigned long tiempoActual = millis(); // Obtiene el tiempo actual en milisegundos
   if (tiempoActual - ultimoMovimientoFuego >= intervaloMovimientoFuego) { // Verifica si ha pasado el intervalo
