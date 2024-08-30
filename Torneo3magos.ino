@@ -1,4 +1,4 @@
-const char *version = "1.02"; // Versión del programa 
+const char *version = "1.03"; // Versión del programa 
 // Adaptación para la Trivia de los 3 Magos
 
 #include "AudioFileSourceSD.h" // Incluye la biblioteca para manejar archivos de audio desde la tarjeta SD
@@ -9,6 +9,7 @@ const char *version = "1.02"; // Versión del programa
 #include "SPI.h" // Incluye la biblioteca para la comunicación SPI
 #include <WiFi.h> // Incluye la biblioteca para conectividad WiFi
 #include <ArduinoOTA.h> // Incluye la biblioteca para actualizaciones OTA (Over-The-Air)
+#include <esp_system.h> // Libreria contiene la declaración de la función esp_aleatorioTRNG() y otras funciones del sistema ESP32.
 //#include <ESP32Servo.h> // Incluye la biblioteca para controlar servomotores
 
 bool OTAhabilitado = false; // Variable para habilitar o deshabilitar actualizaciones OTA
@@ -33,8 +34,8 @@ const char *password = ""; // Contraseña de la red WiFi
 #define PIN_FUEGO 13 // Pin para controlar el Ventilador del Fuego
 #define CANAL_LEDC_3 3 // Canal para el PWM del Ventilador de Fuego
 // Pines para LED RGB
-#define PIN_LED_ROJO 25 // Pin para el LED rojo
-#define PIN_LED_VERDE 26 // Pin para el LED verde
+#define PIN_LED_ROJO 33 // Pin para el LED rojo
+#define PIN_LED_VERDE 14 // Pin para el LED verde
 #define PIN_LED_AZUL 27 // Pin para el LED azul
 
 #define CANAL_LEDC_0 0 // Canal para el LED rojo
@@ -75,6 +76,8 @@ unsigned long tiempoInicioPregunta = 0; // Variable que guarda el tiempo de inic
 // Variables para el control del motor del ventilador que simula el fuego (ver función MoverFuego)
 unsigned long ultimoMovimientoFuego = 0; // Tiempo del último movimiento del servomotor
 const int intervaloMovimientoFuego = 200; // Intervalo de tiempo entre movimientos de velocidad del fuego
+const int velocidadMaximaFuego = 144; // Define el inicio del intervalo de velocidad entre la cual acelerara el ventilado de fuego
+const int velocidadMinimaFuego = 254; //Define el fin del intervalo de velocidad entre la cual acelerara el ventilado de fuego
 void setup() {
   Serial.begin(115200); // Inicializa la comunicación serial a 115200 baudios
   Serial.println(version); // Imprime la versión del programa en el monitor serial
@@ -174,7 +177,7 @@ void seleccionarPreguntasAleatorias() {
     int nuevaPregunta; // Variable para almacenar la nueva pregunta aleatoria
     do {
       // Generar un número aleatorio entre 1 y el total de preguntas por categoría
-      nuevaPregunta = random(1, preguntasPorCategoria + 1);
+      nuevaPregunta = aleatorioTRNG(1, preguntasPorCategoria + 1);
       preguntaUnica = true; // Asumir que la pregunta es única
       // Verificar si la nueva pregunta ya ha sido seleccionada
       for (int j = 0; j < i; j++) {
@@ -249,7 +252,7 @@ void reproducirOpciones() {
   }
   // Barajar las opciones aleatoriamente
   for (int i = 3; i > 0; i--) {
-    int j = random(0, i + 1); // Generar un índice aleatorio
+    int j = aleatorioTRNG(0, i + 1); // Generar un índice aleatorio
     int temp = ordenOpciones[i]; // Almacenar el valor actual
     ordenOpciones[i] = ordenOpciones[j]; // Intercambiar los valores
     ordenOpciones[j] = temp; // Completar el intercambio
@@ -354,11 +357,35 @@ void configurarFuego() {
   ledcSetup(CANAL_LEDC_3, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT); // Configura el canal LEDC 3 para el ventilador fuego
   ledcAttachPin(PIN_FUEGO, CANAL_LEDC_2); // Asocia el pin del LED azul al canal LEDC 2
 }
+/// @brief Función que controla y simula el movimiento aleatorio del fuego.
+///Esta función es encargada de mover simular un efecto de fuego en el circuito. El movimiento del 'fuego' se realiza
+///a través de una variación aleatoria de la velocidad de un ventilador, lo que puede simular diferentes intensidades
+///y patrones de movimiento del fuego.
+///@details La función utiliza la función millis() para obtener el tiempo actual en milisegundos. Si ha transcurrido
+///un tiempo específico (intervaloMovimientoFuego), se genera una velocidad aleatoria (entre mapeoIni y mapeofin) que
+///se utiliza para controlar la velocidad del ventilador. Este valor es mapeado a un rango de velocidad válido para el
+///ventilador y luego escrito en el canal del LEDC correspondiente.
+
 void moverFuego() {
   unsigned long tiempoActual = millis(); // Obtiene el tiempo actual en milisegundos
+  int mapeoIni = 144;
+  int mapeofin = 244;
   if (tiempoActual - ultimoMovimientoFuego >= intervaloMovimientoFuego) { // Verifica si ha pasado el intervalo
-    int velocidad = random(144, 254); // Genera un cambio de velocidad aleatorio para simular un movimiento de fuego
-    ledcWrite(CANAL_LEDC_3, velocidad); // Escribe el valor del LED azul
+  int velocidad = aleatorioTRNG(mapeoIni, mapeofin); // Genera un cambio de velocidad aleatorio para simular un movimiento de fuego
+    int velocidadMap = map(velocidad, mapeoIni, mapeofin, velocidadMaximaFuego, velocidadMinimaFuego);
+       ledcWrite(CANAL_LEDC_3, velocidadMap); // Escribe el valor de la velocidad del ventilador de Fuego
     ultimoMovimientoFuego = tiempoActual; // Actualiza el tiempo del último movimiento
   }
+}
+
+
+// Función para generar un número aleatorio de alta entropía en un rango específico
+long aleatorioTRNG(long minimo, long maximo) {
+  if (minimo >= maximo) {
+    // Si el mínimo es mayor o igual al máximo, devolvemos el mínimo
+    return minimo;
+  }
+  unsigned long rango = maximo - minimo + 1;// Calculamos el rango
+        uint32_t numeroAleatorio = esp_random();// Obtenemos un número aleatorio de 32 bits usando esp_esp_random()
+    return (numeroAleatorio % rango) + minimo; // Ajustamos el número aleatorio al rango deseado y sumamos el mínimo
 }
