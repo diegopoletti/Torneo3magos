@@ -240,9 +240,7 @@ void reproducirPregunta(int numeroPregunta) {
   char rutaPregunta[50]; // Declarar un arreglo de caracteres para la ruta del audio
   // Formatear la ruta del archivo de audio de la pregunta
   snprintf(rutaPregunta, sizeof(rutaPregunta), "/categoria%d/pregunta%d.mp3", categoriaSeleccionada + 1, preguntasSeleccionadas[numeroPregunta]);
-  reproducirAudio(rutaPregunta); // Llamar a la función para reproducir el audio de 
-  
-  a pregunta
+  reproducirAudio(rutaPregunta); // Llamar a la función para reproducir el audio de la pregunta
   yaReprodujo = false; // Preparar para reproducir las opciones
   tiempoInicioPregunta = millis(); // Iniciar el temporizador para la pregunta
 }
