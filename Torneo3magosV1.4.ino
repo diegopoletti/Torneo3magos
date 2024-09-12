@@ -1,4 +1,4 @@
-// Versión del programa
+/* Versión del programa
 const char *version = "1.04";
 
 // Incluimos las bibliotecas necesarias
@@ -476,4 +476,4 @@ long aleatorioTRNG(long minimo, long maximo) {
   unsigned long rango = maximo - minimo;
   uint32_t numeroAleatorio = esp_random();
   return (numeroAleatorio % rango) + minimo;
-}
+}*/
