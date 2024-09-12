@@ -62,7 +62,7 @@ bool yaReprodujo = false; // Bandera que indica si ya se ha reproducido el audio
 // Variables para el manejo de la lógica del cuestionario
 int categoriaSeleccionada = -1; // Variable que guarda la categoría seleccionada por el usuario
 const int totalCategorias = 4; // Total de categorías disponibles
-const int preguntasPorCategoria = 30; // Total de preguntas por cada categoría
+const int preguntasPorCategoria = 15; // Total de preguntas por cada categoría
 const int preguntasPorJuego = 5; // Total de preguntas que se jugarán en una partida
 int preguntasSeleccionadas[preguntasPorJuego]; // Arreglo que guarda las preguntas seleccionadas para el juego
 int preguntaActual = 0; // Índice de la pregunta actual
@@ -240,7 +240,9 @@ void reproducirPregunta(int numeroPregunta) {
   char rutaPregunta[50]; // Declarar un arreglo de caracteres para la ruta del audio
   // Formatear la ruta del archivo de audio de la pregunta
   snprintf(rutaPregunta, sizeof(rutaPregunta), "/categoria%d/pregunta%d.mp3", categoriaSeleccionada + 1, preguntasSeleccionadas[numeroPregunta]);
-  reproducirAudio(rutaPregunta); // Llamar a la función para reproducir el audio de la pregunta
+  reproducirAudio(rutaPregunta); // Llamar a la función para reproducir el audio de 
+  
+  a pregunta
   yaReprodujo = false; // Preparar para reproducir las opciones
   tiempoInicioPregunta = millis(); // Iniciar el temporizador para la pregunta
 }
