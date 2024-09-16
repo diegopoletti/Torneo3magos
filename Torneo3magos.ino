@@ -1,5 +1,5 @@
-const char *version = "1.05"; // Versión del programa actualizada
-
+const char *version = "1.06"; // Versión del programa actualizada
+// Se quito la configuración OTA ya que no se utiliza wifi. 
 // Inclusión de librerías necesarias
 #include "AudioFileSourceSD.h" // Librería para manejar archivos de audio desde la tarjeta SD
 #include "AudioGeneratorMP3.h" // Librería para generar audio en formato MP3
@@ -7,18 +7,9 @@ const char *version = "1.05"; // Versión del programa actualizada
 #include "FS.h" // Librería para el sistema de archivos
 #include "SD.h" // Librería para manejar la tarjeta SD
 #include "SPI.h" // Librería para la comunicación SPI
-#include <WiFi.h> // Librería para manejar la conexión WiFi
-#include <ESPmDNS.h> // Librería para el servicio mDNS
-#include <WiFiUdp.h> // Librería para comunicación UDP sobre WiFi
-#include <ArduinoOTA.h> // Librería para actualizaciones OTA
 #include <esp_system.h> // Librería para funciones del sistema ESP
 
-bool OTAhabilitado = false; // Variable para habilitar o deshabilitar OTA
-
-// Configuración de la red WiFi
-const char *ssid = ""; // Nombre de la red WiFi
-const char *password = ""; // Contraseña de la red WiFi
-
+//bool OTAhabilitado = false; // Variable para habilitar o deshabilitar OTA
 // Definición de pines para el Bus SPI de la Tarjeta SD
 #define SCK 18 // Pin de reloj para SPI
 #define MISO 19 // Pin de datos de entrada para SPI
@@ -135,9 +126,6 @@ void setup() {
   fuente = new AudioFileSourceSD(); // Crea un nuevo objeto de fuente de archivo de audio desde la tarjeta SD
   salida->SetOutputModeMono(true); // Configura la salida de audio en modo mono
 
-  if (OTAhabilitado) // Verifica si la OTA está habilitada
-    iniciarOTA(); // Llama a la función para inicializar OTA si está habilitado
-  
   estadoActual = INTRODUCCION; // Establece el estado inicial del juego a INTRODUCCION
 }
 
@@ -268,9 +256,7 @@ void manejarSeleccionCategoria() {
 
   // Bucle que se ejecuta hasta que se seleccione una categoría
   while (!yaSelecciono) {
-    // Manejo de OTA (Over-The-Air) si está habilitado
-    OTAhabilitado ? ArduinoOTA.handle() : yield();
-    
+
     // Recorremos los botones
     for (int i = 0; i < 4; i++) {
       // Leemos el estado del botón
@@ -486,47 +472,4 @@ void moverFuego() {
     int velocidadFuego = random(velocidadMinimaFuego, velocidadMaximaFuego); // Genera una velocidad aleatoria
     ledcWrite(CANAL_LEDC_3, velocidadFuego); // Escribe la velocidad en el canal del fuego
   }
-}
-
-void iniciarOTA() {
-  WiFi.mode(WIFI_STA); // Configura el modo WiFi
-  WiFi.begin(ssid, password); // Inicia la conexión WiFi
-  // Espera hasta que se conecte
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("Conexión fallida! Reiniciando..."); // Mensaje de error
-    delay(10000); // Espera 10 segundos
-    ESP.restart(); // Reinicia el ESP (comentado)
-  }
-
-  ArduinoOTA.setHostname("ESP32-Trivia"); // Establece el nombre del host para OTA
-  ArduinoOTA
-    .onStart([]() { // Callback al iniciar la actualización
-      String type; // Variable para el tipo de actualización
-      if (ArduinoOTA.getCommand() == U_FLASH)
-        type = "sketch"; // Si es un sketch
-      else // U_SPIFFS
-        type = "filesystem"; // Si es el sistema de archivos
-
-      // NOTE: si se actualiza SPIFFS, este sería el lugar para desmontar SPIFFS usando SPIFFS.end()
-      Serial.println("Start updating " + type); // Mensaje de inicio de actualización
-    })
-    .onEnd([]() { // Callback al finalizar la actualización
-      Serial.println("\nEnd"); // Mensaje de fin
-    })
-    .onProgress([](unsigned int progress, unsigned int total) { // Callback para el progreso
-      Serial.printf("Progress: %u%%\r", (progress / (total / 100))); // Muestra el progreso
-    })
-    .onError([](ota_error_t error) { // Callback para errores
-      Serial.printf("Error[%u]: ", error); // Muestra el error
-      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed"); // Error de autenticación
-      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed"); // Error al iniciar
-      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed"); // Error de conexión
-      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed"); // Error de recepción
-      else if (error == OTA_END_ERROR) Serial.println("End Failed"); // Error al finalizar
-    });;
-  
-  ArduinoOTA.begin(); // Inicia el proceso OTA
-  Serial.println("OTA Listo"); // Mensaje de que OTA está listo
-  Serial.print("Dirección IP: "); // Muestra la dirección IP
-  Serial.println(WiFi.localIP()); // Imprime la dirección IP local
 }
