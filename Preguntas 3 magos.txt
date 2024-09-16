@@ -1,5 +1,154 @@
 Preguntas para Trivia.
- 
+Cultura general argentina_pregunta1: ¿Quién escribió el Martín Fierro?
+Cultura general argentina_pregunta1_opcion1: José Hernández
+Cultura general argentina_pregunta1_opcion2: Domingo Faustino Sarmiento
+Cultura general argentina_pregunta1_opcion3: Jorge Luis Borges
+Cultura general argentina_pregunta1_opcion4: Julio Cortázar
+Cultura general argentina_pregunta2: ¿En qué año se declaró la independencia de Argentina?
+Cultura general argentina_pregunta2_opcion1: 1816
+Cultura general argentina_pregunta2_opcion2: 1810
+Cultura general argentina_pregunta2_opcion3: 1820
+Cultura general argentina_pregunta2_opcion4: 1830
+Cultura general argentina_pregunta3: ¿Cuál es el nombre del famoso estadio de fútbol de Boca Juniors?
+Cultura general argentina_pregunta3_opcion1: La Bombonera
+Cultura general argentina_pregunta3_opcion2: El Monumental
+Cultura general argentina_pregunta3_opcion3: El Cilindro
+Cultura general argentina_pregunta3_opcion4: La Paternal
+Cultura general argentina_pregunta4: ¿Qué cordillera forma el límite natural entre Argentina y Chile?
+Cultura general argentina_pregunta4_opcion1: Los Andes
+Cultura general argentina_pregunta4_opcion2: Las Sierras Pampeanas
+Cultura general argentina_pregunta4_opcion3: La Cordillera Oriental
+Cultura general argentina_pregunta4_opcion4: Las Sierras Subandinas
+Cultura general argentina_pregunta5: ¿Cuál es el nombre del famoso revolucionario argentino conocido como "El Che"?
+Cultura general argentina_pregunta5_opcion1: Ernesto Guevara
+Cultura general argentina_pregunta5_opcion2: Fidel Castro
+Cultura general argentina_pregunta5_opcion3: Juan Domingo Perón
+Cultura general argentina_pregunta5_opcion4: Manuel Belgrano
+Cultura general argentina_pregunta6: ¿Qué bebida tradicional argentina se prepara con yerba mate?
+Cultura general argentina_pregunta6_opcion1: Mate
+Cultura general argentina_pregunta6_opcion2: Terere
+Cultura general argentina_pregunta6_opcion3: Chicha
+Cultura general argentina_pregunta6_opcion4: Fernet
+Cultura general argentina_pregunta7: ¿Cuál es el baile típico argentino que se caracteriza por sus pasos elegantes y sensuales?
+Cultura general argentina_pregunta7_opcion1: Tango
+Cultura general argentina_pregunta7_opcion2: Chacarera
+Cultura general argentina_pregunta7_opcion3: Zamba
+Cultura general argentina_pregunta7_opcion4: Cuarteto
+Cultura general argentina_pregunta8: ¿Qué famoso futbolista argentino es conocido como "La Pulga"?
+Cultura general argentina_pregunta8_opcion1: Lionel Messi
+Cultura general argentina_pregunta8_opcion2: Diego Maradona
+Cultura general argentina_pregunta8_opcion3: Gabriel Batistuta
+Cultura general argentina_pregunta8_opcion4: Sergio Agüero
+Cultura general argentina_pregunta9: ¿Cuál es la capital de la provincia de Buenos Aires?
+Cultura general argentina_pregunta9_opcion1: La Plata
+Cultura general argentina_pregunta9_opcion2: Mar del Plata
+Cultura general argentina_pregunta9_opcion3: Buenos Aires
+Cultura general argentina_pregunta9_opcion4: Bahía Blanca
+Cultura general argentina_pregunta10: ¿Qué científico argentino ganó el Premio Nobel de Medicina en 1947?
+Cultura general argentina_pregunta10_opcion1: Bernardo Houssay
+Cultura general argentina_pregunta10_opcion2: César Milstein
+Cultura general argentina_pregunta10_opcion3: Luis Federico Leloir
+Cultura general argentina_pregunta10_opcion4: René Favaloro
+Cultura general argentina_pregunta11: ¿Cuál es el nombre del famoso glaciar ubicado en la provincia de Santa Cruz?
+Cultura general argentina_pregunta11_opcion1: Perito Moreno
+Cultura general argentina_pregunta11_opcion2: Upsala
+Cultura general argentina_pregunta11_opcion3: Viedma
+Cultura general argentina_pregunta11_opcion4: Spegazzini
+Cultura general argentina_pregunta12: ¿Qué presidente argentino implementó el Plan de Convertibilidad en los años 90?
+Cultura general argentina_pregunta12_opcion1: Carlos Menem
+Cultura general argentina_pregunta12_opcion2: Raúl Alfonsín
+Cultura general argentina_pregunta12_opcion3: Fernando de la Rúa
+Cultura general argentina_pregunta12_opcion4: Néstor Kirchner
+Cultura general argentina_pregunta13: ¿Cuál es el nombre del famoso cantante de tango argentino conocido como "El Zorzal Criollo"?
+Cultura general argentina_pregunta13_opcion1: Carlos Gardel
+Cultura general argentina_pregunta13_opcion2: Astor Piazzolla
+Cultura general argentina_pregunta13_opcion3: Aníbal Troilo
+Cultura general argentina_pregunta13_opcion4: Edmundo Rivero
+Cultura general argentina_pregunta14: ¿Qué escritora argentina ganó el Premio Cervantes en 2018?
+Cultura general argentina_pregunta14_opcion1: Luisa Valenzuela
+Cultura general argentina_pregunta14_opcion2: Ernesto Sabato
+Cultura general argentina_pregunta14_opcion3: Adolfo Bioy Casares
+Cultura general argentina_pregunta14_opcion4: Silvina Ocampo
+Cultura general argentina_pregunta15: ¿Cuál es el nombre del famoso estadio de River Plate?
+Cultura general argentina_pregunta15_opcion1: El Monumental
+Cultura general argentina_pregunta15_opcion2: La Bombonera
+Cultura general argentina_pregunta15_opcion3: El Cilindro
+Cultura general argentina_pregunta15_opcion4: El Gasómetro
+Cultura general argentina_pregunta16: ¿Qué grupo de rock argentino es conocido por canciones como "De música ligera" y "Persiana americana"?
+Cultura general argentina_pregunta16_opcion1: Soda Stereo
+Cultura general argentina_pregunta16_opcion2: Los Fabulosos Cadillacs
+Cultura general argentina_pregunta16_opcion3: Divididos
+Cultura general argentina_pregunta16_opcion4: Rata Blanca
+Cultura general argentina_pregunta17: ¿Cuál es el nombre del famoso parque nacional ubicado en Misiones, hogar de las Cataratas del Iguazú?
+Cultura general argentina_pregunta17_opcion1: Parque Nacional Iguazú
+Cultura general argentina_pregunta17_opcion2: Parque Nacional Nahuel Huapi
+Cultura general argentina_pregunta17_opcion3: Parque Nacional Los Glaciares
+Cultura general argentina_pregunta17_opcion4: Parque Nacional Tierra del Fuego
+Cultura general argentina_pregunta18: ¿Qué famoso pintor argentino es conocido por sus obras surrealistas y sus murales?
+Cultura general argentina_pregunta18_opcion1: Xul Solar
+Cultura general argentina_pregunta18_opcion2: Antonio Berni
+Cultura general argentina_pregunta18_opcion3: Benito Quinquela Martín
+Cultura general argentina_pregunta18_opcion4: Carlos Alonso
+Cultura general argentina_pregunta19: ¿Cuál es el nombre del famoso teatro de ópera de Buenos Aires?
+Cultura general argentina_pregunta19_opcion1: Teatro Colón
+Cultura general argentina_pregunta19_opcion2: Teatro Cervantes
+Cultura general argentina_pregunta19_opcion3: Teatro Gran Rex
+Cultura general argentina_pregunta19_opcion4: Teatro San Martín
+Cultura general argentina_pregunta20: ¿Qué provincia argentina es conocida como "La Tierra del Fuego"?
+Cultura general argentina_pregunta20_opcion1: Tierra del Fuego, Antártida e Islas del Atlántico Sur
+Cultura general argentina_pregunta20_opcion2: Santa Cruz
+Cultura general argentina_pregunta20_opcion3: Chubut
+Cultura general argentina_pregunta20_opcion4: Río Negro
+Cultura general argentina_pregunta21: ¿Cuál es el nombre del famoso político argentino que fundó el Partido Justicialista?
+Cultura general argentina_pregunta21_opcion1: Juan Domingo Perón
+Cultura general argentina_pregunta21_opcion2: Hipólito Yrigoyen
+Cultura general argentina_pregunta21_opcion3: Arturo Frondizi
+Cultura general argentina_pregunta21_opcion4: Raúl Alfonsín
+Cultura general argentina_pregunta22: ¿Qué famoso plato argentino consiste en carne enrollada rellena de huevos, verduras y especias?
+Cultura general argentina_pregunta22_opcion1: Matambre arrollado
+Cultura general argentina_pregunta22_opcion2: Locro
+Cultura general argentina_pregunta22_opcion3: Empanadas
+Cultura general argentina_pregunta22_opcion4: Choripán
+Cultura general argentina_pregunta23: ¿Cuál es el nombre del arquero argentino que atajó los penales decisivos en la final del Mundial 2022?
+Cultura general argentina_pregunta23_opcion1: Emiliano "Dibu" Martínez
+Cultura general argentina_pregunta23_opcion2: Franco Armani
+Cultura general argentina_pregunta23_opcion3: Sergio Romero
+Cultura general argentina_pregunta23_opcion4: Willy Caballero
+Cultura general argentina_pregunta24: ¿Qué famosa actriz argentina protagonizó la película "Evita" junto a Madonna?
+Cultura general argentina_pregunta24_opcion1: Susana Giménez
+Cultura general argentina_pregunta24_opcion2: Norma Aleandro
+Cultura general argentina_pregunta24_opcion3: Graciela Borges
+Cultura general argentina_pregunta24_opcion4: Cecilia Roth
+Cultura general argentina_pregunta25: ¿Cuál es el nombre del río que forma parte del límite entre Argentina y Uruguay?
+Cultura general argentina_pregunta25_opcion1: Río Uruguay
+Cultura general argentina_pregunta25_opcion2: Río Paraná
+Cultura general argentina_pregunta25_opcion3: Río de la Plata
+Cultura general argentina_pregunta25_opcion4: Río Salado
+Cultura general argentina_pregunta26: ¿Qué famoso escritor argentino escribió "El Aleph" y "Ficciones"?
+Cultura general argentina_pregunta26_opcion1: Jorge Luis Borges
+Cultura general argentina_pregunta26_opcion2: Julio Cortázar
+Cultura general argentina_pregunta26_opcion3: Adolfo Bioy Casares
+Cultura general argentina_pregunta26_opcion4: Ernesto Sabato
+Cultura general argentina_pregunta27: ¿Cuál es el animal nacional de Argentina?
+Cultura general argentina_pregunta27_opcion1: Hornero
+Cultura general argentina_pregunta27_opcion2: Cóndor
+Cultura general argentina_pregunta27_opcion3: Yaguareté
+Cultura general argentina_pregunta27_opcion4: Carpincho
+Cultura general argentina_pregunta28: ¿En qué provincia argentina se encuentra el Valle de la Luna?
+Cultura general argentina_pregunta28_opcion1: San Juan
+Cultura general argentina_pregunta28_opcion2: La Rioja
+Cultura general argentina_pregunta28_opcion3: Mendoza
+Cultura general argentina_pregunta28_opcion4: Catamarca
+Cultura general argentina_pregunta29: ¿Qué famoso tenista argentino ganó el US Open en 2009?
+Cultura general argentina_pregunta29_opcion1: Juan Martín del Potro
+Cultura general argentina_pregunta29_opcion2: Guillermo Vilas
+Cultura general argentina_pregunta29_opcion3: David Nalbandian
+Cultura general argentina_pregunta29_opcion4: Gastón Gaudio
+Cultura general argentina_pregunta30: ¿Cuál es el nombre de la avenida más ancha del mundo, ubicada en Buenos Aires?
+Cultura general argentina_pregunta30_opcion1: Avenida 9 de Julio
+Cultura general argentina_pregunta30_opcion2: Avenida Corrientes
+Cultura general argentina_pregunta30_opcion3: Avenida de Mayo
+Cultura general argentina_pregunta30_opcion4: Avenida Rivadavia 
 Categoria2_pregunta1: ¿Cuál es el nombre completo de Categoria2?
 Categoria2_pregunta1_opcion1: Harry James Potter
 Categoria2_pregunta1_opcion2: Harry Sirius Potter
