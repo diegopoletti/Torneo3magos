@@ -1,0 +1,451 @@
+Preguntas para Trivia.
+ 
+Categoria2_pregunta1: ¿Cuál es el nombre completo de Categoria2?
+Categoria2_pregunta1_opcion1: Harry James Potter
+Categoria2_pregunta1_opcion2: Harry Sirius Potter
+Categoria2_pregunta1_opcion3: Harry Albus Potter
+Categoria2_pregunta1_opcion4: Harry Ronald Potter
+Categoria2_pregunta2: ¿Quién es el director de Hogwarts al inicio de la serie?
+Categoria2_pregunta2_opcion1: Albus Dumbledore
+Categoria2_pregunta2_opcion2: Severus Snape
+Categoria2_pregunta2_opcion3: Minerva McGonagall
+Categoria2_pregunta2_opcion4: Rubeus Hagrid
+Categoria2_pregunta3: ¿Cuál es la casa de Hogwarts a la que pertenece Categoria2?
+Categoria2_pregunta3_opcion1: Gryffindor
+Categoria2_pregunta3_opcion2: Slytherin
+Categoria2_pregunta3_opcion3: Ravenclaw
+Categoria2_pregunta3_opcion4: Hufflepuff
+Categoria2_pregunta4: ¿Cómo se llama el mejor amigo de Categoria2?
+Categoria2_pregunta4_opcion1: Ron Weasley
+Categoria2_pregunta4_opcion2: Neville Longbottom
+Categoria2_pregunta4_opcion3: Draco Malfoy
+Categoria2_pregunta4_opcion4: Seamus Finnigan
+Categoria2_pregunta5: ¿Qué criatura mágica es Hedwig, la mascota de Harry?
+Categoria2_pregunta5_opcion1: Lechuza
+Categoria2_pregunta5_opcion2: Gato
+Categoria2_pregunta5_opcion3: Rata
+Categoria2_pregunta5_opcion4: Sapo
+Categoria2_pregunta6: ¿Cuál es el deporte más popular en el mundo mágico?
+Categoria2_pregunta6_opcion1: Quidditch
+Categoria2_pregunta6_opcion2: Ajedrez mágico
+Categoria2_pregunta6_opcion3: Gobstones
+Categoria2_pregunta6_opcion4: Snap explosivo
+Categoria2_pregunta7: ¿Cómo se llama el banco de los magos?
+Categoria2_pregunta7_opcion1: Gringotts
+Categoria2_pregunta7_opcion2: Wizardbank
+Categoria2_pregunta7_opcion3: Magicoin
+Categoria2_pregunta7_opcion4: Spellvault
+Categoria2_pregunta8: ¿Quién es el principal antagonista de la serie?
+Categoria2_pregunta8_opcion1: Lord Voldemort
+Categoria2_pregunta8_opcion2: Bellatrix Lestrange
+Categoria2_pregunta8_opcion3: Lucius Malfoy
+Categoria2_pregunta8_opcion4: Severus Snape
+Categoria2_pregunta9: ¿Cuál es el nombre de la estación de tren desde donde parte el Expreso de Hogwarts?
+Categoria2_pregunta9_opcion1: King's Cross
+Categoria2_pregunta9_opcion2: Paddington
+Categoria2_pregunta9_opcion3: Victoria
+Categoria2_pregunta9_opcion4: Waterloo
+Categoria2_pregunta10: ¿Qué criatura mágica puede verse solo por aquellos que han presenciado la muerte?
+Categoria2_pregunta10_opcion1: Thestral
+Categoria2_pregunta10_opcion2: Hipogrifo
+Categoria2_pregunta10_opcion3: Unicornio
+Categoria2_pregunta10_opcion4: Fénix
+Categoria2_pregunta11: ¿Cuál es el nombre del elfo doméstico que ayuda a Harry en la Cámara Secreta?
+Categoria2_pregunta11_opcion1: Dobby
+Categoria2_pregunta11_opcion2: Kreacher
+Categoria2_pregunta11_opcion3: Winky
+Categoria2_pregunta11_opcion4: Hokey
+Categoria2_pregunta12: ¿Qué objeto mágico permite viajar en el tiempo?
+Categoria2_pregunta12_opcion1: Giratiempo
+Categoria2_pregunta12_opcion2: Traslador
+Categoria2_pregunta12_opcion3: Recordadora
+Categoria2_pregunta12_opcion4: Pensadero
+Categoria2_pregunta13: ¿Cuál es el nombre del mapa mágico que muestra todo Hogwarts?
+Categoria2_pregunta13_opcion1: Mapa del Merodeador
+Categoria2_pregunta13_opcion2: Mapa de Hogwarts
+Categoria2_pregunta13_opcion3: Pergamino Encantado
+Categoria2_pregunta13_opcion4: Plano Mágico
+Categoria2_pregunta14: ¿Qué criatura mágica puede cambiar su apariencia a voluntad?
+Categoria2_pregunta14_opcion1: Metamorfomago
+Categoria2_pregunta14_opcion2: Animago
+Categoria2_pregunta14_opcion3: Boggart
+Categoria2_pregunta14_opcion4: Veela
+Categoria2_pregunta15: ¿Cuál es el nombre del perro de tres cabezas que guarda la Piedra Filosofal?
+Categoria2_pregunta15_opcion1: Fluffy
+Categoria2_pregunta15_opcion2: Fang
+Categoria2_pregunta15_opcion3: Padfoot
+Categoria2_pregunta15_opcion4: Snuffles
+Categoria2_pregunta16: ¿Qué poción permite transformarse temporalmente en otra persona?
+Categoria2_pregunta16_opcion1: Poción multijugos
+Categoria2_pregunta16_opcion2: Poción de la verdad
+Categoria2_pregunta16_opcion3: Filtro de amor
+Categoria2_pregunta16_opcion4: Felix Felicis
+Categoria2_pregunta17: ¿Cuál es el nombre del periódico más popular del mundo mágico?
+Categoria2_pregunta17_opcion1: El Profeta
+Categoria2_pregunta17_opcion2: El Quisquilloso
+Categoria2_pregunta17_opcion3: Corazón de Bruja
+Categoria2_pregunta17_opcion4: La Gaceta del Mago
+Categoria2_pregunta18: ¿Qué criatura mágica renace de sus propias cenizas?
+Categoria2_pregunta18_opcion1: Fénix
+Categoria2_pregunta18_opcion2: Dragón
+Categoria2_pregunta18_opcion3: Basilisco
+Categoria2_pregunta18_opcion4: Acromántula
+Categoria2_pregunta19: ¿Cuál es el nombre del profesor de Pociones en los primeros libros?
+Categoria2_pregunta19_opcion1: Severus Snape
+Categoria2_pregunta19_opcion2: Horace Slughorn
+Categoria2_pregunta19_opcion3: Quirinus Quirrell
+Categoria2_pregunta19_opcion4: Remus Lupin
+Categoria2_pregunta20: ¿Qué objeto mágico muestra el mayor deseo del corazón de quien lo mira?
+Categoria2_pregunta20_opcion1: Espejo de Oesed
+Categoria2_pregunta20_opcion2: Bola de cristal
+Categoria2_pregunta20_opcion3: Pensadero
+Categoria2_pregunta20_opcion4: Recordadora
+Categoria2_pregunta21: ¿Cuál es el nombre del hermano gemelo de Fred Weasley?
+Categoria2_pregunta21_opcion1: George
+Categoria2_pregunta21_opcion2: Percy
+Categoria2_pregunta21_opcion3: Charlie
+Categoria2_pregunta21_opcion4: Bill
+Categoria2_pregunta22: ¿Qué criatura mágica es mitad caballo y mitad águila?
+Categoria2_pregunta22_opcion1: Hipogrifo
+Categoria2_pregunta22_opcion2: Centauro
+Categoria2_pregunta22_opcion3: Grifo
+Categoria2_pregunta22_opcion4: Pegaso
+Categoria2_pregunta23: ¿Cuál es el nombre de la prisión mágica custodiada por dementores?
+Categoria2_pregunta23_opcion1: Azkaban
+Categoria2_pregunta23_opcion2: Nurmengard
+Categoria2_pregunta23_opcion3: Gringotts
+Categoria2_pregunta23_opcion4: San Mungo
+Categoria2_pregunta24: ¿Qué animal puede transformarse Sirius Black?
+Categoria2_pregunta24_opcion1: Perro negro
+Categoria2_pregunta24_opcion2: Gato atigrado
+Categoria2_pregunta24_opcion3: Ciervo
+Categoria2_pregunta24_opcion4: Rata
+Categoria2_pregunta25: ¿Cuál es el nombre del elfo doméstico de la familia Black?
+Categoria2_pregunta25_opcion1: Kreacher
+Categoria2_pregunta25_opcion2: Dobby
+Categoria2_pregunta25_opcion3: Winky
+Categoria2_pregunta25_opcion4: Hokey
+Categoria2_pregunta26: ¿Qué criatura mágica guarda las bóvedas más profundas de Gringotts?
+Categoria2_pregunta26_opcion1: Dragón
+Categoria2_pregunta26_opcion2: Troll
+Categoria2_pregunta26_opcion3: Esfinge
+Categoria2_pregunta26_opcion4: Basilisco
+Categoria2_pregunta27: ¿Cuál es el nombre del pub que sirve como entrada al Callejón Diagon?
+Categoria2_pregunta27_opcion1: El Caldero Chorreante
+Categoria2_pregunta27_opcion2: Las Tres Escobas
+Categoria2_pregunta27_opcion3: Cabeza de Puerco
+Categoria2_pregunta27_opcion4: El Palo de Escoba
+Categoria2_pregunta28: ¿Qué criatura mágica puede petrificar con su mirada?
+Categoria2_pregunta28_opcion1: Basilisco
+Categoria2_pregunta28_opcion2: Medusa
+Categoria2_pregunta28_opcion3: Gorgona
+Categoria2_pregunta28_opcion4: Cocatriz
+Categoria2_pregunta29: ¿Cuál es el nombre del árbol violento que se encuentra en los terrenos de Hogwarts?
+Categoria2_pregunta29_opcion1: Sauce Boxeador
+Categoria2_pregunta29_opcion2: Roble Luchador
+Categoria2_pregunta29_opcion3: Pino Peleón
+Categoria2_pregunta29_opcion4: Arce Agresivo
+Categoria2_pregunta30: ¿Qué objeto mágico usa Hermione para asistir a más clases en su tercer año?
+Categoria2_pregunta30_opcion1: Giratiempo
+Categoria2_pregunta30_opcion2: Capa de invisibilidad
+Categoria2_pregunta30_opcion3: Varita de saúco
+Categoria2_pregunta30_opcion4: Piedra de la resurrección
+Categoria3_pregunta1: ¿Cuál es la unidad básica de resistencia eléctrica?
+Categoria3_pregunta1_opcion1: Ohm
+Categoria3_pregunta1_opcion2: Amperio
+Categoria3_pregunta1_opcion3: Voltio
+Categoria3_pregunta1_opcion4: Watt
+Categoria3_pregunta2: ¿Qué componente electrónico almacena carga eléctrica?
+Categoria3_pregunta2_opcion1: Condensador
+Categoria3_pregunta2_opcion2: Resistencia
+Categoria3_pregunta2_opcion3: Diodo
+Categoria3_pregunta2_opcion4: Transistor
+Categoria3_pregunta3: ¿Cuál es la función principal de un diodo?
+Categoria3_pregunta3_opcion1: Permitir el flujo de corriente en una sola dirección
+Categoria3_pregunta3_opcion2: Amplificar señales
+Categoria3_pregunta3_opcion3: Almacenar energía
+Categoria3_pregunta3_opcion4: Medir voltaje
+Categoria3_pregunta4: ¿Qué ley relaciona la corriente, el voltaje y la resistencia en un circuito?
+Categoria3_pregunta4_opcion1: Ley de Ohm
+Categoria3_pregunta4_opcion2: Ley de Faraday
+Categoria3_pregunta4_opcion3: Ley de Coulomb
+Categoria3_pregunta4_opcion4: Ley de Ampère
+Categoria3_pregunta5: ¿Cuál es la unidad de medida de la frecuencia?
+Categoria3_pregunta5_opcion1: Hertz
+Categoria3_pregunta5_opcion2: Watt
+Categoria3_pregunta5_opcion3: Amperio
+Categoria3_pregunta5_opcion4: Voltio
+Categoria3_pregunta6: ¿Qué componente electrónico amplifica señales eléctricas?
+Categoria3_pregunta6_opcion1: Transistor
+Categoria3_pregunta6_opcion2: Resistencia
+Categoria3_pregunta6_opcion3: Condensador
+Categoria3_pregunta6_opcion4: Diodo
+Categoria3_pregunta7: ¿Cuál es la función principal de un transformador?
+Categoria3_pregunta7_opcion1: Cambiar el voltaje de una corriente alterna
+Categoria3_pregunta7_opcion2: Almacenar energía eléctrica
+Categoria3_pregunta7_opcion3: Generar electricidad
+Categoria3_pregunta7_opcion4: Medir la resistencia
+Categoria3_pregunta8: ¿Qué tipo de señal alterna completa un ciclo cada 360 grados?
+Categoria3_pregunta8_opcion1: Señal sinusoidal
+Categoria3_pregunta8_opcion2: Señal cuadrada
+Categoria3_pregunta8_opcion3: Señal triangular
+Categoria3_pregunta8_opcion4: Señal diente de sierra
+Categoria3_pregunta9: ¿Cuál es la unidad de medida de la potencia eléctrica?
+Categoria3_pregunta9_opcion1: Watt
+Categoria3_pregunta9_opcion2: Amperio
+Categoria3_pregunta9_opcion3: Voltio
+Categoria3_pregunta9_opcion4: Ohm
+Categoria3_pregunta10: ¿Qué componente electrónico se utiliza para regular el voltaje?
+Categoria3_pregunta10_opcion1: Diodo Zener
+Categoria3_pregunta10_opcion2: Resistencia
+Categoria3_pregunta10_opcion3: Condensador
+Categoria3_pregunta10_opcion4: Bobina
+Categoria3_pregunta11_opcion1: Proteger contra sobrecorrientes
+Categoria3_pregunta11_opcion2: Amplificar la señal
+Categoria3_pregunta11_opcion3: Almacenar energía
+Categoria3_pregunta11_opcion4: Regular el voltaje
+Categoria3_pregunta12: ¿Qué tipo de componente electrónico es un LED?
+Categoria3_pregunta12_opcion1: Diodo emisor de luz
+Categoria3_pregunta12_opcion2: Resistencia variable
+Categoria3_pregunta12_opcion3: Transistor bipolar
+Categoria3_pregunta12_opcion4: Condensador electrolítico
+Categoria3_pregunta13: ¿Cuál es la unidad de medida de la capacitancia?
+Categoria3_pregunta13_opcion1: Faradio
+Categoria3_pregunta13_opcion2: Henry
+Categoria3_pregunta13_opcion3: Weber
+Categoria3_pregunta13_opcion4: Tesla
+Categoria3_pregunta14: ¿Qué tipo de circuito integrado puede almacenar información?
+Categoria3_pregunta14_opcion1: Memoria RAM
+Categoria3_pregunta14_opcion2: Amplificador operacional
+Categoria3_pregunta14_opcion3: Regulador de voltaje
+Categoria3_pregunta14_opcion4: Puente rectificador
+Categoria3_pregunta15: ¿Cuál es la función principal de un osciloscopio?
+Categoria3_pregunta15_opcion1: Visualizar señales eléctricas
+Categoria3_pregunta15_opcion2: Generar ondas de radio
+Categoria3_pregunta15_opcion3: Amplificar señales de audio
+Categoria3_pregunta15_opcion4: Medir resistencias
+Categoria3_pregunta16: ¿Qué componente electrónico se utiliza para almacenar energía magnética?
+Categoria3_pregunta16_opcion1: Bobina o inductor
+Categoria3_pregunta16_opcion2: Condensador
+Categoria3_pregunta16_opcion3: Resistencia
+Categoria3_pregunta16_opcion4: Diodo
+Categoria3_pregunta17: ¿Cuál es la unidad de medida de la inductancia?
+Categoria3_pregunta17_opcion1: Henry
+Categoria3_pregunta17_opcion2: Faradio
+Categoria3_pregunta17_opcion3: Ohm
+Categoria3_pregunta17_opcion4: Coulomb
+Categoria3_pregunta18: ¿Qué tipo de transistor tiene tres capas de material semiconductor?
+Categoria3_pregunta18_opcion1: Transistor bipolar
+Categoria3_pregunta18_opcion2: MOSFET
+Categoria3_pregunta18_opcion3: JFET
+Categoria3_pregunta18_opcion4: Transistor unijuntura
+Categoria3_pregunta19: ¿Cuál es la función principal de un rectificador?
+Categoria3_pregunta19_opcion1: Convertir corriente alterna en corriente continua
+Categoria3_pregunta19_opcion2: Amplificar señales
+Categoria3_pregunta19_opcion3: Medir voltaje
+Categoria3_pregunta19_opcion4: Regular la frecuencia
+Categoria3_pregunta20: ¿Qué ley establece que la suma de las corrientes que entran a un nodo es igual a la suma de las corrientes que salen?
+Categoria3_pregunta20_opcion1: Ley de Kirchhoff de las corrientes
+Categoria3_pregunta20_opcion2: Ley de Ohm
+Categoria3_pregunta20_opcion3: Ley de Faraday
+Categoria3_pregunta20_opcion4: Ley de Coulomb
+Categoria3_pregunta21: ¿Cuál es la función principal de un multiplexor?
+Categoria3_pregunta21_opcion1: Seleccionar una de varias entradas y enviarla a una salida
+Categoria3_pregunta21_opcion2: Amplificar señales de baja potencia
+Categoria3_pregunta21_opcion3: Convertir señales analógicas en digitales
+Categoria3_pregunta21_opcion4: Almacenar datos temporalmente
+Categoria3_pregunta22: ¿Qué tipo de memoria mantiene su información incluso sin energía?
+Categoria3_pregunta22_opcion1: Memoria ROM
+Categoria3_pregunta22_opcion2: Memoria RAM
+Categoria3_pregunta22_opcion3: Memoria caché
+Categoria3_pregunta22_opcion4: Registro de desplazamiento
+Categoria3_pregunta23: ¿Cuál es la función principal de un optoacoplador?
+Categoria3_pregunta23_opcion1: Aislar eléctricamente dos circuitos
+Categoria3_pregunta23_opcion2: Amplificar señales de luz
+Categoria3_pregunta23_opcion3: Convertir señales eléctricas en ópticas
+Categoria3_pregunta23_opcion4: Medir la intensidad lumínica
+Categoria3_pregunta24: ¿Qué componente electrónico se utiliza para convertir energía mecánica en eléctrica?
+Categoria3_pregunta24_opcion1: Generador
+Categoria3_pregunta24_opcion2: Motor
+Categoria3_pregunta24_opcion3: Transformador
+Categoria3_pregunta24_opcion4: Amplificador
+Categoria3_pregunta25: ¿Cuál es la unidad de medida de la carga eléctrica?
+Categoria3_pregunta25_opcion1: Coulomb
+Categoria3_pregunta25_opcion2: Amperio
+Categoria3_pregunta25_opcion3: Voltio
+Categoria3_pregunta25_opcion4: Watt
+Categoria3_pregunta26: ¿Qué tipo de semiconductor se obtiene al dopar silicio con impurezas pentavalentes?
+Categoria3_pregunta26_opcion1: Semiconductor tipo N
+Categoria3_pregunta26_opcion2: Semiconductor tipo P
+Categoria3_pregunta26_opcion3: Semiconductor intrínseco
+Categoria3_pregunta26_opcion4: Semiconductor amorfo
+Categoria3_pregunta27: ¿Cuál es la función principal de un decodificador?
+Categoria3_pregunta27_opcion1: Convertir un código binario en salidas individuales
+Categoria3_pregunta27_opcion2: Amplificar señales digitales
+Categoria3_pregunta27_opcion3: Almacenar datos temporalmente
+Categoria3_pregunta27_opcion4: Regular el voltaje de salida
+Categoria3_pregunta28: ¿Qué tipo de señal tiene solo dos estados posibles?
+Categoria3_pregunta28_opcion1: Señal digital
+Categoria3_pregunta28_opcion2: Señal analógica
+Categoria3_pregunta28_opcion3: Señal modulada
+Categoria3_pregunta28_opcion4: Señal continua
+Categoria3_pregunta29: ¿Cuál es la función principal de un flip-flop?
+Categoria3_pregunta29_opcion1: Almacenar un bit de información
+Categoria3_pregunta29_opcion2: Amplificar señales de alta frecuencia
+Categoria3_pregunta29_opcion3: Convertir corriente alterna en continua
+Categoria3_pregunta29_opcion4: Medir la frecuencia de una señal
+Categoria3_pregunta30: ¿Qué ley establece que la suma algebraica de las tensiones en una malla cerrada es cero?
+Categoria3_pregunta30_opcion1: Ley de Kirchhoff de las tensiones
+Categoria3_pregunta30_opcion2: Ley de Ohm
+Categoria3_pregunta30_opcion3: Ley de Faraday
+Categoria3_pregunta30_opcion4: Ley de Ampère
+Categoria4_pregunta1: ¿Cuál es el río más largo del mundo?
+Categoria4_pregunta1_opcion1: Nilo
+Categoria4_pregunta1_opcion2: Amazonas
+Categoria4_pregunta1_opcion3: Yangtsé
+Categoria4_pregunta1_opcion4: Misisipi
+Categoria4_pregunta2: ¿En qué año se fundó la red social Facebook?
+Categoria4_pregunta2_opcion1: 2004
+Categoria4_pregunta2_opcion2: 2006
+Categoria4_pregunta2_opcion3: 2008
+Categoria4_pregunta2_opcion4: 2002
+Categoria4_pregunta3: ¿Cuál es el elemento químico más abundante en el universo?
+Categoria4_pregunta3_opcion1: Hidrógeno
+Categoria4_pregunta3_opcion2: Helio
+Categoria4_pregunta3_opcion3: Oxígeno
+Categoria4_pregunta3_opcion4: Carbono
+Categoria4_pregunta4: ¿Quién pintó "La noche estrellada"?
+Categoria4_pregunta4_opcion1: Vincent van Gogh
+Categoria4_pregunta4_opcion2: Pablo Picasso
+Categoria4_pregunta4_opcion3: Claude Monet
+Categoria4_pregunta4_opcion4: Salvador Dalí
+Categoria4_pregunta5: ¿Cuál es el planeta más grande del sistema solar?
+Categoria4_pregunta5_opcion1: Júpiter
+Categoria4_pregunta5_opcion2: Saturno
+Categoria4_pregunta5_opcion3: Neptuno
+Categoria4_pregunta5_opcion4: Urano
+Categoria4_pregunta6: ¿En qué año se llevó a cabo la Revolución Francesa?
+Categoria4_pregunta6_opcion1: 1789
+Categoria4_pregunta6_opcion2: 1776
+Categoria4_pregunta6_opcion3: 1804
+Categoria4_pregunta6_opcion4: 1812
+Categoria4_pregunta7: ¿Cuál es el metal más caro del mundo?
+Categoria4_pregunta7_opcion1: Rodio
+Categoria4_pregunta7_opcion2: Oro
+Categoria4_pregunta7_opcion3: Platino
+Categoria4_pregunta7_opcion4: Paladio
+Categoria4_pregunta8: ¿Quién escribió "Cien años de soledad"?
+Categoria4_pregunta8_opcion1: Gabriel García Márquez
+Categoria4_pregunta8_opcion2: Mario Vargas Llosa
+Categoria4_pregunta8_opcion3: Julio Cortázar
+Categoria4_pregunta8_opcion4: Isabel Allende
+Categoria4_pregunta9: ¿Cuál es el océano más grande del mundo?
+Categoria4_pregunta9_opcion1: Océano Pacífico
+Categoria4_pregunta9_opcion2: Océano Atlántico
+Categoria4_pregunta9_opcion3: Océano Índico
+Categoria4_pregunta9_opcion4: Océano Ártico
+Categoria4_pregunta10: ¿En qué año se estrenó la primera película de Star Wars?
+Categoria4_pregunta10_opcion1: 1977
+Categoria4_pregunta10_opcion2: 1980
+Categoria4_pregunta10_opcion3: 1975
+Categoria4_pregunta10_opcion4: 1983
+Categoria4_pregunta11: ¿Cuál es el animal terrestre más rápido del mundo?
+Categoria4_pregunta11_opcion1: Guepardo
+Categoria4_pregunta11_opcion2: León
+Categoria4_pregunta11_opcion3: Gacela
+Categoria4_pregunta11_opcion4: Leopardo
+Categoria4_pregunta12: ¿Quién fue el primer ser humano en pisar la Luna?
+Categoria4_pregunta12_opcion1: Neil Armstrong
+Categoria4_pregunta12_opcion2: Buzz Aldrin
+Categoria4_pregunta12_opcion3: Yuri Gagarin
+Categoria4_pregunta12_opcion4: John Glenn
+Categoria4_pregunta13: ¿Cuál es la capital de Canadá?
+Categoria4_pregunta13_opcion1: Ottawa
+Categoria4_pregunta13_opcion2: Toronto
+Categoria4_pregunta13_opcion3: Montreal
+Categoria4_pregunta13_opcion4: Vancouver
+Categoria4_pregunta14: ¿En qué año se inauguró la Torre Eiffel?
+Categoria4_pregunta14_opcion1: 1889
+Categoria4_pregunta14_opcion2: 1900
+Categoria4_pregunta14_opcion3: 1875
+Categoria4_pregunta14_opcion4: 1910
+Categoria4_pregunta15: ¿Cuál es el instrumento musical más antiguo conocido?
+Categoria4_pregunta15_opcion1: Flauta
+Categoria4_pregunta15_opcion2: Tambor
+Categoria4_pregunta15_opcion3: Arpa
+Categoria4_pregunta15_opcion4: Lira
+Categoria4_pregunta16: ¿Quién escribió "Romeo y Julieta"?
+Categoria4_pregunta16_opcion1: William Shakespeare
+Categoria4_pregunta16_opcion2: Charles Dickens
+Categoria4_pregunta16_opcion3: Jane Austen
+Categoria4_pregunta16_opcion4: Miguel de Cervantes
+Categoria4_pregunta17: ¿Cuál es el metal más abundante en la corteza terrestre?
+Categoria4_pregunta17_opcion1: Aluminio
+Categoria4_pregunta17_opcion2: Hierro
+Categoria4_pregunta17_opcion3: Cobre
+Categoria4_pregunta17_opcion4: Zinc
+Categoria4_pregunta18: ¿En qué año se fundó la Organización de las Naciones Unidas (ONU)?
+Categoria4_pregunta18_opcion1: 1945
+Categoria4_pregunta18_opcion2: 1950
+Categoria4_pregunta18_opcion3: 1939
+Categoria4_pregunta18_opcion4: 1955
+Categoria4_pregunta19: ¿Cuál es el desierto más grande del mundo?
+Categoria4_pregunta19_opcion1: Sahara
+Categoria4_pregunta19_opcion2: Gobi
+Categoria4_pregunta19_opcion3: Atacama
+Categoria4_pregunta19_opcion4: Kalahari
+Categoria4_pregunta20: ¿Quién compuso la Novena Sinfonía?
+Categoria4_pregunta20_opcion1: Ludwig van Beethoven
+Categoria4_pregunta20_opcion2: Wolfgang Amadeus Mozart
+Categoria4_pregunta20_opcion3: Johann Sebastian Bach
+Categoria4_pregunta20_opcion4: Franz Schubert
+Categoria4_pregunta21: ¿Cuál es el ave más grande del mundo?
+Categoria4_pregunta21_opcion1: Avestruz
+Categoria4_pregunta21_opcion2: Cóndor andino
+Categoria4_pregunta21_opcion3: Águila real
+Categoria4_pregunta21_opcion4: Albatros errante
+Categoria4_pregunta22: ¿En qué año se proclamó la independencia de Estados Unidos?
+Categoria4_pregunta22_opcion1: 1776
+Categoria4_pregunta22_opcion2: 1789
+Categoria4_pregunta22_opcion3: 1800
+Categoria4_pregunta22_opcion4: 1812
+Categoria4_pregunta23: ¿Cuál es el elemento más pesado de la tabla periódica?
+Categoria4_pregunta23_opcion1: Oganesón
+Categoria4_pregunta23_opcion2: Uranio
+Categoria4_pregunta23_opcion3: Plutonio
+Categoria4_pregunta23_opcion4: Plomo
+Categoria4_pregunta24: ¿Quién pintó "La última cena"?
+Categoria4_pregunta24_opcion1: Leonardo da Vinci
+Categoria4_pregunta24_opcion2: Miguel Ángel
+Categoria4_pregunta24_opcion3: Rafael
+Categoria4_pregunta24_opcion4: Sandro Botticelli
+Categoria4_pregunta25: ¿Cuál es la montaña más alta del mundo?
+Categoria4_pregunta25_opcion1: Monte Everest
+Categoria4_pregunta25_opcion2: K2
+Categoria4_pregunta25_opcion3: Kangchenjunga
+Categoria4_pregunta25_opcion4: Lhotse
+Categoria4_pregunta26: ¿En qué año se lanzó el primer iPhone?
+Categoria4_pregunta26_opcion1: 2007
+Categoria4_pregunta26_opcion2: 2005
+Categoria4_pregunta26_opcion3: 2009
+Categoria4_pregunta26_opcion4: 2010
+Categoria4_pregunta27: ¿Cuál es el país más poblado del mundo?
+Categoria4_pregunta27_opcion1: China
+Categoria4_pregunta27_opcion2: India
+Categoria4_pregunta27_opcion3: Estados Unidos
+Categoria4_pregunta27_opcion4: Indonesia
+Categoria4_pregunta28: ¿Quién escribió "El Principito"?
+Categoria4_pregunta28_opcion1: Antoine de Saint-Exupéry
+Categoria4_pregunta28_opcion2: Jules Verne
+Categoria4_pregunta28_opcion3: Victor Hugo
+Categoria4_pregunta28_opcion4: Albert Camus
+Categoria4_pregunta29: ¿Cuál es el elemento químico más abundante en la Tierra?
+Categoria4_pregunta29_opcion1: Oxígeno
+Categoria4_pregunta29_opcion2: Silicio
+Categoria4_pregunta29_opcion3: Aluminio
+Categoria4_pregunta29_opcion4: Hierro
+Categoria4_pregunta30: ¿En qué año cayó el Muro de Berlín?
+Categoria4_pregunta30_opcion1: 1989
+Categoria4_pregunta30_opcion2: 1991
+Categoria4_pregunta30_opcion3: 1985
+Categoria4_pregunta30_opcion4: 1993
