@@ -1,392 +1,532 @@
-const char *version = "1.03"; // Versión del programa 
-// Adaptación para la Trivia de los 3 Magos
+const char *version = "1.05"; // Versión del programa actualizada
 
-#include "AudioFileSourceSD.h" // Incluye la biblioteca para manejar archivos de audio desde la tarjeta SD
-#include "AudioGeneratorMP3.h" // Incluye la biblioteca para generar audio en formato MP3
-#include "AudioOutputI2SNoDAC.h" // Incluye la biblioteca para salida de audio I2S sin DAC
-#include "FS.h" // Incluye la biblioteca del sistema de archivos
-#include "SD.h" // Incluye la biblioteca para manejar la tarjeta SD
-#include "SPI.h" // Incluye la biblioteca para la comunicación SPI
-#include <WiFi.h> // Incluye la biblioteca para conectividad WiFi
-#include <ArduinoOTA.h> // Incluye la biblioteca para actualizaciones OTA (Over-The-Air)
-#include <esp_system.h> // Libreria contiene la declaración de la función esp_aleatorioTRNG() y otras funciones del sistema ESP32.
-//#include <ESP32Servo.h> // Incluye la biblioteca para controlar servomotores
+// Inclusión de librerías necesarias
+#include "AudioFileSourceSD.h" // Librería para manejar archivos de audio desde la tarjeta SD
+#include "AudioGeneratorMP3.h" // Librería para generar audio en formato MP3
+#include "AudioOutputI2SNoDAC.h" // Librería para salida de audio I2S sin DAC
+#include "FS.h" // Librería para el sistema de archivos
+#include "SD.h" // Librería para manejar la tarjeta SD
+#include "SPI.h" // Librería para la comunicación SPI
+#include <WiFi.h> // Librería para manejar la conexión WiFi
+#include <ESPmDNS.h> // Librería para el servicio mDNS
+#include <WiFiUdp.h> // Librería para comunicación UDP sobre WiFi
+#include <ArduinoOTA.h> // Librería para actualizaciones OTA
+#include <esp_system.h> // Librería para funciones del sistema ESP
 
-bool OTAhabilitado = false; // Variable para habilitar o deshabilitar actualizaciones OTA
+bool OTAhabilitado = false; // Variable para habilitar o deshabilitar OTA
 
 // Configuración de la red WiFi
 const char *ssid = ""; // Nombre de la red WiFi
 const char *password = ""; // Contraseña de la red WiFi
 
-// Pines del Bus SPI para la conexión de la Tarjeta SD
+// Definición de pines para el Bus SPI de la Tarjeta SD
 #define SCK 18 // Pin de reloj para SPI
 #define MISO 19 // Pin de datos de entrada para SPI
 #define MOSI 23 // Pin de datos de salida para SPI
 #define CS 5 // Pin de selección de chip para la tarjeta SD
 
-// Pines para los pulsadores (ahora activos en bajo)
-#define PIN_BOTON_1 4 // Pin para el primer pulsador
-#define PIN_BOTON_2 15 // Pin para el segundo pulsador
-#define PIN_BOTON_3 34 // Pin para el tercer pulsador
-#define PIN_BOTON_4 35 // Pin para el cuarto pulsador
+// Definición de pines para los pulsadores (activos en bajo)
+#define PIN_BOTON_1 4 // Pin para el primer botón
+#define PIN_BOTON_2 15 // Pin para el segundo botón
+#define PIN_BOTON_3 35 // Pin para el tercer botón
+#define PIN_BOTON_4 34 // Pin para el cuarto botón
 
-// Pin para el motor Ventilador
-#define PIN_FUEGO 13 // Pin para controlar el Ventilador del Fuego
-#define CANAL_LEDC_3 3 // Canal para el PWM del Ventilador de Fuego
-// Pines para LED RGB
+// Definición de pin para el motor Ventilador
+#define PIN_FUEGO 13 // Pin para controlar el motor del ventilador
+#define CANAL_LEDC_3 3 // Canal LEDC para el control del ventilador
+
+// Definición de pines para LED RGB
 #define PIN_LED_ROJO 33 // Pin para el LED rojo
 #define PIN_LED_VERDE 14 // Pin para el LED verde
 #define PIN_LED_AZUL 27 // Pin para el LED azul
 
-#define CANAL_LEDC_0 0 // Canal para el LED rojo
-#define CANAL_LEDC_1 1 // Canal para el LED verde
-#define CANAL_LEDC_2 2 // Canal para el LED azul
+// Definición de canales LEDC para PWM
+#define CANAL_LEDC_0 0 // Canal LEDC para el primer PWM
+#define CANAL_LEDC_1 1 // Canal LEDC para el segundo PWM
+#define CANAL_LEDC_2 2 // Canal LEDC para el tercer PWM
 
-#define LEDC_TIMER_8_BIT 8 // Resolución del temporizador LEDC
-#define FRECUENCIA_BASE_LEDC 5000 // Frecuencia base para el control de los LEDs y Ventilador
+// Configuración del timer LEDC
+#define LEDC_TIMER_8_BIT 8 // Resolución del timer LEDC en bits
+#define FRECUENCIA_BASE_LEDC 5000 // Frecuencia base para el PWM
 
-
-bool pulsadorPresionado = false; // Variable para verificar si un pulsador ha sido presionado
-
-// Variables para el estado de los pulsadores y manejo del debounce
-bool pulsadoresPresionados[4] = {false, false, false, false}; // Arreglo que guarda el estado de cada pulsador
-unsigned long ultimosTiemposPulsadores[4] = {0, 0, 0, 0}; // Arreglo que almacena el último tiempo de pulsación de cada botón
-const unsigned long debounceDelay = 120; // Tiempo de espera para evitar rebotes en los pulsadores
+// Variables para el manejo de los pulsadores
+bool pulsadoresPresionados[4] = {false, false, false, false}; // Estado de los pulsadores
+unsigned long ultimosTiemposPulsadores[4] = {0, 0, 0, 0}; // Último tiempo de pulsación
+const unsigned long debounceDelay = 120; // Tiempo de debounce para los pulsadores
 
 // Variables para el manejo del audio
-AudioGeneratorMP3 *mp3; // Puntero para el generador de audio MP3
-AudioFileSourceSD *fuente; // Puntero para la fuente de audio desde la tarjeta SD
-AudioOutputI2SNoDAC *salida; // Puntero para la salida de audio I2S sin DAC
-bool yaReprodujo = false; // Bandera que indica si ya se ha reproducido el audio de introducción
+AudioGeneratorMP3 *mp3; // Generador de audio MP3
+AudioFileSourceSD *fuente; // Fuente de audio (tarjeta SD)
+AudioOutputI2SNoDAC *salida; // Salida de audio
 
 // Variables para el manejo de la lógica del cuestionario
-int categoriaSeleccionada = -1; // Variable que guarda la categoría seleccionada por el usuario
-const int totalCategorias = 4; // Total de categorías disponibles
-const int preguntasPorCategoria = 15; // Total de preguntas por cada categoría
-const int preguntasPorJuego = 5; // Total de preguntas que se jugarán en una partida
-int preguntasSeleccionadas[preguntasPorJuego]; // Arreglo que guarda las preguntas seleccionadas para el juego
+int categoriaSeleccionada = -1; // Categoría seleccionada por el jugador
+const int totalCategorias = 4; // Número total de categorías
+const int preguntasPorCategoria = 15; // Número de preguntas por categoría
+const int preguntasPorJuego = 5; // Número de preguntas por juego
+int preguntasSeleccionadas[preguntasPorJuego]; // Array para almacenar las preguntas seleccionadas
 int preguntaActual = 0; // Índice de la pregunta actual
 int respuestasCorrectas = 0; // Contador de respuestas correctas
-int ordenOpciones[totalCategorias]; // Arreglo que guarda el orden de las opciones de respuesta
+int ordenOpciones[totalCategorias]; // Orden de las opciones de respuesta
 
 // Variable para el tiempo límite de respuesta
-const unsigned long tiempoLimiteRespuesta = 30000; // 30 segundos, configurable
-unsigned long tiempoInicioPregunta = 0; // Variable que guarda el tiempo de inicio de la pregunta
+const unsigned long tiempoLimiteRespuesta = 30000; // Tiempo límite en milisegundos
+unsigned long tiempoInicioPregunta = 0; // Tiempo de inicio de la pregunta actual
 
-// Variables para el control del motor del ventilador que simula el fuego (ver función MoverFuego)
-unsigned long ultimoMovimientoFuego = 0; // Tiempo del último movimiento del servomotor
-const int intervaloMovimientoFuego = 200; // Intervalo de tiempo entre movimientos de velocidad del fuego
-const int velocidadMaximaFuego = 144; // Define el inicio del intervalo de velocidad entre la cual acelerara el ventilado de fuego
-const int velocidadMinimaFuego = 254; //Define el fin del intervalo de velocidad entre la cual acelerara el ventilado de fuego
+// Variables para el control del motor del ventilador
+unsigned long ultimoMovimientoFuego = 0; // Último tiempo de movimiento del fuego
+const int intervaloMovimientoFuego = 200; // Intervalo entre movimientos del fuego
+const int velocidadMaximaFuego = 144; // Velocidad máxima del fuego
+const int velocidadMinimaFuego = 254; // Velocidad mínima del fuego
+
+// Enumeración para el manejo de estados del juego
+// Estado inicial donde se presenta el juego al usuario
+// Estado inicial donde se presenta el juego al usuario
+// Estado donde el usuario elige la categoría de preguntas
+// Estado en el que se muestra la pregunta al usuario
+// Estado donde se presentan las opciones de respuesta
+// Estado en el que el juego espera la respuesta del usuario
+// Estado que muestra el resultado de la respuesta
+// Estado final que indica que el juego ha terminado
+enum EstadoJuego {
+  INTRODUCCION,          
+  SELECCION_CATEGORIA,   
+  REPRODUCCION_PREGUNTA, 
+  REPRODUCCION_OPCIONES,  
+  ESPERA_RESPUESTA,      
+  REPRODUCCION_RESULTADO, 
+  FIN_JUEGO              
+};
+
+EstadoJuego estadoActual = INTRODUCCION; // Estado actual del juego
+bool reproduccionEnCurso = false; // Indica si hay una reproducción de audio en curso
+String archivoAudioActual = ""; // Nombre del archivo de audio actual
+bool respuestaCorrecta = false; // Indica si la respuesta dada es correcta
+bool yaReprodujoFin = false; // Indica si ya analizo una vez el fin del juego
+
+// Nuevas variables para el manejo de la reproducción de opciones
+int opcionActual = 0; // Índice de la opción actual
+bool reproduccionAnuncioOpcion = false; // Indica si se está reproduciendo el anuncio de opción
+
 void setup() {
-  Serial.begin(115200); // Inicializa la comunicación serial a 115200 baudios
-  Serial.println(version); // Imprime la versión del programa en el monitor serial
+  Serial.begin(115200); // Inicialización de la comunicación serial a 115200 baudios
+  Serial.println(version); // Impresión de la versión del programa en el monitor serial
 
-  if (!SD.begin(CS)) { // Intenta inicializar la tarjeta SD
+  // Inicialización de la tarjeta SD
+  if (!SD.begin(CS)) { // Comienza la tarjeta SD usando el pin CS
     Serial.println("Tarjeta SD no encontrada"); // Mensaje de error si la tarjeta SD no se encuentra
-    return; // Sale de la función si no se encuentra la tarjeta
+    return; // Sale de la función si la tarjeta SD no está disponible
   }
 
-  randomSeed(analogRead(0)); // Inicializa la semilla para la generación de números aleatorios
+  randomSeed(esp_random()); // Inicialización de la semilla aleatoria usando un número aleatorio del ESP
 
-  pinMode(PIN_BOTON_1, INPUT_PULLUP); // Configura el primer botón como entrada con resistencia pull-up
-  pinMode(PIN_BOTON_2, INPUT_PULLUP); // Configura el segundo botón como entrada con resistencia pull-up
-  pinMode(PIN_BOTON_3, INPUT_PULLUP); // Configura el tercer botón como entrada con resistencia pull-up
-  pinMode(PIN_BOTON_4, INPUT_PULLUP); // Configura el cuarto botón como entrada con resistencia pull-up
+  // Configuración de los pines de los botones como entrada con pull-up
+  pinMode(PIN_BOTON_1, INPUT_PULLUP); // Configura el PIN_BOTON_1 como entrada con resistencia pull-up
+  pinMode(PIN_BOTON_2, INPUT_PULLUP); // Configura el PIN_BOTON_2 como entrada con resistencia pull-up
+  pinMode(PIN_BOTON_3, INPUT_PULLUP); // Configura el PIN_BOTON_3 como entrada con resistencia pull-up
+  pinMode(PIN_BOTON_4, INPUT_PULLUP); // Configura el PIN_BOTON_4 como entrada con resistencia pull-up
   
-  configurarLED(); // Llama a la función para configurar el LED
-  configurarFuego(); //Llama a la funcón para configurar el PWM del ventilador que simulará el fuego 
+  configurarLED(); // Llama a la función para configurar los pines del LED RGB
+  configurarFuego(); // Llama a la función para configurar el pin del ventilador
 
-  mp3 = new AudioGeneratorMP3(); // Crea una nueva instancia del generador de audio MP3
-  salida = new AudioOutputI2SNoDAC(); // Crea una nueva instancia de salida de audio I2S sin DAC
-  fuente = new AudioFileSourceSD(); // Crea una nueva instancia de fuente de audio desde la tarjeta SD
+  // Inicialización de los objetos de audio
+  mp3 = new AudioGeneratorMP3(); // Crea un nuevo generador de audio MP3
+  salida = new AudioOutputI2SNoDAC(); // Crea un nuevo objeto de salida de audio I2S sin DAC
+  fuente = new AudioFileSourceSD(); // Crea un nuevo objeto de fuente de archivo de audio desde la tarjeta SD
   salida->SetOutputModeMono(true); // Configura la salida de audio en modo mono
 
   if (OTAhabilitado) // Verifica si la OTA está habilitada
-    iniciarOTA(); // Llama a la función para iniciar la actualización OTA
+    iniciarOTA(); // Llama a la función para inicializar OTA si está habilitado
   
-  reproducirIntroduccion(); // Llama a la función para reproducir el audio de introducción
+  estadoActual = INTRODUCCION; // Establece el estado inicial del juego a INTRODUCCION
 }
+
 void loop() {
-  // Verifica si la OTA está habilitada y maneja la actualización, de lo contrario, libera el procesador
-  OTAhabilitado ? ArduinoOTA.handle() : yield();
+  yield(); // Permite que otras tareas se ejecuten, evitando que el programa se congele
+  moverFuego(); // Actualización del movimiento del fuego
+
+  // Máquina de estados para el manejo del juego
+  switch (estadoActual) {
+    case INTRODUCCION: // Estado de introducción del juego
+      manejarIntroduccion(); // Llama a la función que maneja la introducción
+      break;
+    case SELECCION_CATEGORIA: // Estado donde el jugador selecciona la categoría
+      manejarSeleccionCategoria(); // Llama a la función para manejar la selección de categoría
+      break;
+    case REPRODUCCION_PREGUNTA: // Estado para reproducir la pregunta
+      manejarReproduccionPregunta(); // Llama a la función que maneja la reproducción de la pregunta
+      break;
+    case REPRODUCCION_OPCIONES: // Estado para mostrar las opciones de respuesta
+      manejarReproduccionOpciones(); // Llama a la función que maneja la reproducción de opciones
+      break;
+    case ESPERA_RESPUESTA: // Estado donde se espera la respuesta del jugador
+      manejarEsperaRespuesta(); // Llama a la función que maneja la espera de respuesta
+      break;
+    case REPRODUCCION_RESULTADO: // Estado para reproducir el resultado
+      manejarReproduccionResultado(); // Llama a la función que maneja la reproducción del resultado
+      break;
+    case FIN_JUEGO: // Estado final del juego
+      manejarFinJuego(); // Llama a la función que maneja el fin del juego
+      break;
+  }
   
-  // Captura el tiempo actual en milisegundos
-  unsigned long tiempoActual = millis();
-     moverFuego(); // Llama a la función para cambiar la velocidad de movimiento del ventilador simulación de fuego
-  // Comprueba si el reproductor de MP3 está en funcionamiento
-  if (mp3->isRunning()) {
-    // Si el MP3 no está en bucle y ya se reprodujo, detiene la reproducción
-    if (!mp3->loop() && yaReprodujo) {
-      yaReprodujo = false; // Reinicia la bandera de reproducción
-      mp3->stop(); // Detiene el MP3
-      fuente->close(); // Cierra la fuente de audio
-      Serial.println("Audio Stop"); // Imprime en el monitor serie que el audio se detuvo
-      Serial.println("Archivo Cerrado"); // Imprime que el archivo se cerró
-      yield(); // Libera el procesador para otras tareas
-    } else {
-      // Verifica si la OTA está habilitada y maneja la actualización, de lo contrario, libera el procesador
-      OTAhabilitado ? ArduinoOTA.handle() : yield();
-      yield(); //libera los recursos para otras funciones del dispocitivo
-   
-    }
-  } else {
-    // Si no hay un MP3 en ejecución, verifica la categoría seleccionada
-    if (categoriaSeleccionada == -1) {
-      verificarSeleccionCategoria(); // Llama a la función para verificar la selección de categoría
-    } else if (preguntaActual < preguntasPorJuego) {
-      // Si hay preguntas por jugar, verifica si se debe reproducir la pregunta
-      if (!yaReprodujo) {
-        reproducirPregunta(preguntaActual); // Reproduce la pregunta actual
-      } else {
-        verificarRespuestaPregunta(); // Verifica la respuesta a la pregunta actual
-      }
-    } else {
-      finalizarJuego(); // Finaliza el juego si no hay más preguntas
-    }
-  }
+  manejarReproduccionAudio(); // Manejo de la reproducción de audio
 }
 
-void verificarSeleccionCategoria() {
-  int PIN_BOTONES[4] = {PIN_BOTON_1, PIN_BOTON_2, PIN_BOTON_3, PIN_BOTON_4};
-  // Recorre los botones para verificar la selección de categoría
-  for (int i = 0; i < 4; i++) {
-    int lectura = digitalRead(PIN_BOTONES[i]); // Lee el estado del botón
-    Serial.print("pin a leer: "); Serial.println(PIN_BOTONES[i]);
-    unsigned long tiempoActual = millis(); // Captura el tiempo actual
-
-    // Verifica si el botón fue presionado y si no ha sido registrado antes
-    if (lectura == LOW && !pulsadoresPresionados[i] && (tiempoActual - ultimosTiemposPulsadores[i] > debounceDelay)) {
-      pulsadoresPresionados[i] = true; // Marca el botón como presionado
-      ultimosTiemposPulsadores[i] = tiempoActual; // Actualiza el tiempo del último botón presionado
-      categoriaSeleccionada = i; // Asigna la categoría seleccionada
-      Serial.print("Categoría seleccionada: "); // Imprime la categoría seleccionada
-      Serial.println(categoriaSeleccionada + 1); // Muestra el número de categoría en el monitor serie
-      seleccionarPreguntasAleatorias(); // Llama a la función para seleccionar preguntas aleatorias
-      reproducirPregunta(preguntaActual); // Reproduce la pregunta actual
-      reproducirOpciones();
-    } else if (lectura == HIGH) {
-      pulsadoresPresionados[i] = false; // Marca el botón como no presionado
-    }
-  }
-}
-void seleccionarPreguntasAleatorias() {
-  // Iterar a través de la cantidad de preguntas que se jugarán
-  for (int i = 0; i < preguntasPorJuego; i++) {
-    bool preguntaUnica; // Variable para verificar si la pregunta es única
-    int nuevaPregunta; // Variable para almacenar la nueva pregunta aleatoria
-    do {
-      // Generar un número aleatorio entre 1 y el total de preguntas por categoría
-      nuevaPregunta = aleatorioTRNG(1, preguntasPorCategoria + 1);
-      preguntaUnica = true; // Asumir que la pregunta es única
-      // Verificar si la nueva pregunta ya ha sido seleccionada
-      for (int j = 0; j < i; j++) {
-        if (preguntasSeleccionadas[j] == nuevaPregunta) {
-          preguntaUnica = false; // No es única, cambiar la variable
-          break; // Salir del bucle si se encuentra una coincidencia
-        }
-      }
-    } while (!preguntaUnica); // Repetir hasta que se encuentre una pregunta única
-    preguntasSeleccionadas[i] = nuevaPregunta; // Almacenar la pregunta seleccionada
-  }
-}
-
-void verificarRespuestaPregunta() {
-  unsigned long tiempoActual = millis(); // Obtener el tiempo actual
-  
-  // Comprobar si el tiempo límite para responder ha pasado
-  if (tiempoActual - tiempoInicioPregunta >= tiempoLimiteRespuesta) {
-    // Tiempo agotado, marcar como incorrecta y avanzar
-    LedPWM(255, 0, 0); // Encender LED rojo para respuesta incorrecta
-    reproducirAudio("/incorrecta.mp3"); // Reproducir audio de respuesta incorrecta
-    avanzarSiguientePregunta(); // Avanzar a la siguiente pregunta
-    return; // Salir de la función
-  }
-  int PIN_BOTONES[4] = {PIN_BOTON_1, PIN_BOTON_2, PIN_BOTON_3, PIN_BOTON_4};
-  // Verificar las respuestas de los botones
-  for (int i = 0; i < 4; i++) {
-    int lectura = digitalRead(PIN_BOTONES[i]); // Lee el estado del botón
-    Serial.print("pin a leer: "); Serial.println(PIN_BOTONES[i]);
-      // Comprobar si el botón fue presionado
-    if (lectura == LOW && !pulsadoresPresionados[i] && (tiempoActual - ultimosTiemposPulsadores[i] > debounceDelay)) {
-      pulsadoresPresionados[i] = true; // Marcar el botón como presionado
-      ultimosTiemposPulsadores[i] = tiempoActual; // Actualizar el tiempo del último botón presionado
+void manejarReproduccionAudio() {
+  if (mp3->isRunning()) { // Si hay una reproducción en curso
+    if (!mp3->loop()) { // Si la reproducción ha terminado
+      yield(); // Permitir que otras tareas se ejecuten
+      mp3->stop(); // Detener la reproducción
+      fuente->close(); // Cerrar el archivo de audio
+      reproduccionEnCurso = false; // Marcar que no hay reproducción en curso
+      Serial.println("Audio detenido y archivo cerrado"); // Mensaje de estado
       
-      // Verificar si la respuesta es correcta
-      if (ordenOpciones[i] == 0) { // La opción 1 (índice 0) siempre es la correcta
-        respuestasCorrectas++; // Incrementar el contador de respuestas correctas
-        LedPWM(0, 255, 0); // Encender LED verde para respuesta correcta
-        reproducirAudio("/correcta.mp3"); // Reproducir audio de respuesta correcta
-      } else {
-        LedPWM(255, 0, 0); // Encender LED rojo para respuesta incorrecta
-        reproducirAudio("/incorrecta.mp3"); // Reproducir audio de respuesta incorrecta
+      // Manejo de la transición de estados después de la reproducción
+      switch (estadoActual) {
+        case INTRODUCCION: // Si el estado actual es INTRODUCCION
+         Serial.println("Estado actual Intro pasando a Seleccion de categória"); // Mensaje de transición
+          estadoActual = SELECCION_CATEGORIA; // Cambiar a SELECCION_CATEGORIA
+          break;
+        case REPRODUCCION_PREGUNTA: // Si el estado actual es REPRODUCCION_PREGUNTA
+          Serial.println("Estado actual REPRODUCCION_PREGUNTA: pasando a REPRODUCCION_OPCIONES"); // Mensaje de transición
+          estadoActual = REPRODUCCION_OPCIONES; // Cambiar a REPRODUCCION_OPCIONES
+          opcionActual = 0; // Reiniciar el contador de opciones
+          reproduccionAnuncioOpcion = true; // Preparar para reproducir el anuncio de opción
+          break;
+        case REPRODUCCION_OPCIONES: // Si el estado actual es REPRODUCCION_OPCIONES
+          if (reproduccionAnuncioOpcion) { // Si se está reproduciendo el anuncio de opción
+            reproduccionAnuncioOpcion = false; // Cambiar a reproducción de la opción
+          } else {
+            opcionActual++; // Pasar a la siguiente opción
+            if (opcionActual < 4) { // Si hay más opciones disponibles
+              reproduccionAnuncioOpcion = true; // Preparar para el siguiente anuncio
+            } else {
+              Serial.println("Estado actual REPRODUCCION_OPCIONES pasando a ESPERA_RESPUESTA:"); // Mensaje de transición
+              estadoActual = ESPERA_RESPUESTA; // Cambiar a ESPERA_RESPUESTA
+              tiempoInicioPregunta = millis(); // Guardar el tiempo de inicio de la pregunta
+            }
+          }
+          break;
+        case REPRODUCCION_RESULTADO: // Si el estado actual es REPRODUCCION_RESULTADO
+          preguntaActual++; // Incrementar el contador de preguntas
+          if (preguntaActual < preguntasPorJuego) { // Si hay más preguntas por jugar
+            estadoActual = REPRODUCCION_PREGUNTA; // Cambiar a REPRODUCCION_PREGUNTA
+          } else {
+            estadoActual = FIN_JUEGO; // Cambiar a FIN_JUEGO si no hay más preguntas
+          }
+          break;
+        default: // Si el estado no coincide con ninguno de los anteriores
+          break; // No hacer nada
       }
-      
-      avanzarSiguientePregunta(); // Avanzar a la siguiente pregunta
-      return; // Salir de la función
-    } else if (lectura == HIGH) {
-      pulsadoresPresionados[i] = false; // Marcar el botón como no presionado
     }
+  } else if (!reproduccionEnCurso && !archivoAudioActual.isEmpty()) { // Si no hay reproducción y hay un archivo pendiente
+    reproducirAudio(archivoAudioActual.c_str()); // Llamar a la función para reproducir el audio
+    //if (fuente->open(archivoAudioActual.c_str())) { // Abrir el archivo de audio
+      //mp3->begin(fuente, salida); // Iniciar la reproducción
+      reproduccionEnCurso = true; // Marcar que se ha iniciado la reproducción
+      //Serial.println("Iniciando reproducción de: " + archivoAudioActual); // Mensaje de inicio de reproducción
+    //} else {
+    //  Serial.println("Error al abrir el archivo: " + archivoAudioActual); // Mensaje de error si no se puede abrir el archivo
+    //  archivoAudioActual = ""; // Limpiar la ruta del archivo
+    //}
   }
-}
-void avanzarSiguientePregunta() {
-  preguntaActual++; // Incrementar el índice de la pregunta actual
-  if (preguntaActual < preguntasPorJuego) { // Verificar si hay más preguntas disponibles
-    yaReprodujo = false; // Preparar para reproducir la siguiente pregunta y opciones
-  }
-}
-
-void reproducirPregunta(int numeroPregunta) {
-  char rutaPregunta[50]; // Declarar un arreglo de caracteres para la ruta del audio
-  // Formatear la ruta del archivo de audio de la pregunta
-  snprintf(rutaPregunta, sizeof(rutaPregunta), "/categoria%d/pregunta%d.mp3", categoriaSeleccionada + 1, preguntasSeleccionadas[numeroPregunta]);
-  reproducirAudio(rutaPregunta); // Llamar a la función para reproducir el audio de la pregunta
-  
-  yaReprodujo = false; // Preparar para reproducir las opciones
-  tiempoInicioPregunta = millis(); // Iniciar el temporizador para la pregunta
-}
-
-void reproducirOpciones() {
-  // Generar orden aleatorio de opciones
-  for (int i = 0; i < 4; i++) {
-    ordenOpciones[i] = i; // Asignar el índice a cada opción
-  }
-  // Barajar las opciones aleatoriamente
-  for (int i = 3; i > 0; i--) {
-    int j = aleatorioTRNG(0, i + 1); // Generar un índice aleatorio
-    int temp = ordenOpciones[i]; // Almacenar el valor actual
-    ordenOpciones[i] = ordenOpciones[j]; // Intercambiar los valores
-    ordenOpciones[j] = temp; // Completar el intercambio
-  }
-
-  // Reproducir opciones en orden aleatorio
-  for (int i = 0; i < 4; i++) {
-    char rutaOpcion[50]; // Declarar un arreglo de caracteres para la ruta de la opción
-    // Formatear la ruta del archivo de audio de la opción
-    snprintf(rutaOpcion, sizeof(rutaOpcion), "/categoria%d/pregunta%d_opcion%d.mp3", 
-             categoriaSeleccionada + 1, preguntasSeleccionadas[preguntaActual], ordenOpciones[i] + 1);
-    reproducirAudio(rutaOpcion); // Llamar a la función para reproducir el audio de la opción
-    while (mp3->isRunning()) { // Mientras el audio esté reproduciéndose
-      if (!mp3->loop()) { // Verificar si el audio ha terminado de reproducirse
-        mp3->stop(); // Detener la reproducción
-        fuente->close(); // Cerrar la fuente de audio
-        break; // Salir del bucle
-      }
-      moverFuego(); // Mover la velocidad del fuego
-    }
-    delay(500); // Pequeña pausa entre opciones
-    moverFuego(); // Mover la velocidad del fuego
-  }
-  yaReprodujo = true; // Indicar que se han reproducido todas las opciones
-}
-void finalizarJuego() {
-  const char* archivoResultado; // Declaración de una variable para almacenar la ruta del archivo de resultado
-  if (respuestasCorrectas == preguntasPorJuego) { // Verifica si todas las respuestas son correctas
-    archivoResultado = "/campeon.mp3"; // Asigna el archivo de audio para el campeón
-    LedPWM(255, 255, 255); // Blanco para campeón
-  } else if (respuestasCorrectas > preguntasPorJuego * 0.7) { // Verifica si el jugador es un ganador
-    archivoResultado = "/ganador.mp3"; // Asigna el archivo de audio para el ganador
-    LedPWM(255, 165, 0); // Naranja para ganador
-  } else { // Si no es campeón ni ganador, es perdedor
-    archivoResultado = "/perdedor.mp3"; // Asigna el archivo de audio para el perdedor
-    LedPWM(0, 0, 255); // Azul para perdedor
-  }
-  reproducirAudio(archivoResultado); // Reproduce el audio correspondiente
-  
-  // Reiniciar variables para un nuevo juego
-  categoriaSeleccionada = -1; // Reinicia la categoría seleccionada
-  preguntaActual = 0; // Reinicia la pregunta actual
-  respuestasCorrectas = 0; // Reinicia el conteo de respuestas correctas
-}
-
-void reproducirIntroduccion() {
-  const char *archivoIntroduccion = "/intro.mp3"; // Ruta del archivo de introducción
-  reproducirAudio(archivoIntroduccion); // Reproduce el audio de introducción
 }
 
 void reproducirAudio(const char *ruta) {
   if (!SD.exists(ruta)) { // Verifica si el archivo existe en la tarjeta SD
     Serial.print("Archivo no encontrado: "); // Mensaje de error si no se encuentra el archivo
-    Serial.println(ruta); // archivo
+    Serial.println(ruta); // Mostrar el nombre del archivo
     return; // Sale de la función si el archivo no existe
   }
 
   if (!fuente->open(ruta)) { // Intenta abrir el archivo de audio
     Serial.print("Error al abrir el archivo: "); // Mensaje de error si no se puede abrir el archivo
-    Serial.println(ruta); // archivo
+    Serial.println(ruta); // Mostrar el nombre del archivo
     return; // Sale de la función si hay un error al abrir el archivo
   }
-
+  Serial.print("Iniciando reproducción de: "); // Mensaje de inicio de reproducción
+  Serial.println(ruta); // Mostrar el nombre del archivo que se está reproduciendo
   yield(); // Permite que otras tareas se ejecuten
   mp3->begin(fuente, salida); // Inicia la reproducción del archivo de audio
-  yaReprodujo = true; // Marca que ya se ha reproducido el audio
-  
- }
+  //yaReprodujo = true; // Marca que ya se ha reproducido el audio
+  archivoAudioActual = ""; // Limpiar la ruta de audio 
+}
 
-/// @brief Configura los pines de LED en la placa Arduino para un Torneo de Mágicos.
-///   Este método establece las configuraciones necesarias y asocia los pines de las
-///   luces RGB (rojo, verde, azul) a los canales de LEDC para ser controladas por el sistema
+void manejarIntroduccion() {
+  if (!reproduccionEnCurso && archivoAudioActual.isEmpty()) { // Si no hay reproducción y no hay archivo de audio
+    archivoAudioActual = "/intro.mp3"; // Establecer el archivo de introducción
+  }
+}
+void manejarSeleccionCategoria() {
+  // Definimos los pines de los botones
+  int PIN_BOTONES[4] = {PIN_BOTON_1, PIN_BOTON_2, PIN_BOTON_3, PIN_BOTON_4};
+  // Guardamos el tiempo actual
+  unsigned long tiempoActual = millis();
+  // Variable para verificar si se ha seleccionado una categoría
+  bool yaSelecciono = false;
+
+  // Bucle que se ejecuta hasta que se seleccione una categoría
+  while (!yaSelecciono) {
+    // Manejo de OTA (Over-The-Air) si está habilitado
+    OTAhabilitado ? ArduinoOTA.handle() : yield();
+    
+    // Recorremos los botones
+    for (int i = 0; i < 4; i++) {
+      // Leemos el estado del botón
+      int lectura = digitalRead(PIN_BOTONES[i]);
+      // Actualizamos el tiempo actual
+      unsigned long tiempoActual = millis();
+
+      // Verificamos si el botón fue presionado
+      if (lectura == LOW && !pulsadoresPresionados[i] && (tiempoActual - ultimosTiemposPulsadores[i] > debounceDelay)) {
+        // Marcamos el botón como presionado
+        pulsadoresPresionados[i] = true;
+        // Actualizamos el tiempo de la última pulsación
+        ultimosTiemposPulsadores[i] = tiempoActual;
+        // Guardamos la categoría seleccionada
+        categoriaSeleccionada = i;
+        Serial.print("Categoría seleccionada: ");
+        Serial.println(categoriaSeleccionada + 1);
+        // Llamamos a la función para seleccionar preguntas aleatorias
+        seleccionarPreguntasAleatorias();
+        Serial.println("Estado actual manejarSeleccionCategoria pasando a REPRODUCCION_PREGUNTA:");
+        // Cambiamos el estado actual
+        estadoActual = REPRODUCCION_PREGUNTA;
+        yaSelecciono = true; // Marcamos que ya se seleccionó
+        break; // Salimos del bucle
+      } else if (lectura == HIGH) {
+        // Si el botón no está presionado, lo marcamos como no presionado
+        pulsadoresPresionados[i] = false;
+      }
+    }
+    yield(); // Permite que otras tareas se ejecuten
+  }
+}
+
+void manejarReproduccionPregunta() {
+  // Verificamos si no hay reproducción en curso y si no hay archivo de audio actual
+  if (!reproduccionEnCurso && archivoAudioActual.isEmpty()) {
+    // Creamos la ruta del archivo de audio de la pregunta
+    char rutaPregunta[50];
+    snprintf(rutaPregunta, sizeof(rutaPregunta), "/categoria%d/pregunta%d.mp3", categoriaSeleccionada + 1, preguntasSeleccionadas[preguntaActual]);
+    archivoAudioActual = String(rutaPregunta); // Asignamos la ruta al archivo actual
+    Serial.println("Pregunta a reproducir: " + archivoAudioActual); // Mostramos la pregunta en el monitor serie
+  }
+}
+
+void manejarReproduccionOpciones() {
+  // Verificamos si no hay reproducción en curso y si no hay archivo de audio actual
+  if (!reproduccionEnCurso && archivoAudioActual.isEmpty()) {
+    if (reproduccionAnuncioOpcion) {
+      // Reproducir el anuncio de la opción
+      char rutaAnuncio[50];
+      snprintf(rutaAnuncio, sizeof(rutaAnuncio), "/anuncio_opcion%d.mp3", opcionActual + 1);
+      archivoAudioActual = String(rutaAnuncio); // Asignamos la ruta del anuncio
+      Serial.println("Asignacion de Boton: " + archivoAudioActual); // Mostramos la asignación en el monitor serie
+    } else {
+      // Reproducir la opción
+      char rutaOpcion[50];
+      snprintf(rutaOpcion, sizeof(rutaOpcion), "/categoria%d/pregunta%d_opcion%d.mp3", 
+               categoriaSeleccionada + 1, preguntasSeleccionadas[preguntaActual], ordenOpciones[opcionActual] + 1);
+      archivoAudioActual = String(rutaOpcion); // Asignamos la ruta de la opción
+      Serial.println("Archivo de pregunta correspondiente: " + archivoAudioActual); // Mostramos la opción en el monitor serie
+    }
+  }
+}
+
+void manejarEsperaRespuesta() {
+  // Guardamos el tiempo actual
+  unsigned long tiempoActual = millis();
+  // Verificamos si el tiempo límite de respuesta ha sido superado
+  if (tiempoActual - tiempoInicioPregunta > tiempoLimiteRespuesta) {
+    // Tiempo agotado, pasar a la siguiente pregunta
+    estadoActual = REPRODUCCION_RESULTADO;
+    respuestaCorrecta = false; // Marcamos que la respuesta no fue correcta
+    return; // Salimos de la función
+  }
+
+  // Definimos los pines de los botones
+  int PIN_BOTONES[4] = {PIN_BOTON_1, PIN_BOTON_2, PIN_BOTON_3, PIN_BOTON_4};
+  // Recorremos los botones
+  for (int i = 0; i < 4; i++) {
+    // Leemos el estado del botón
+    int lectura = digitalRead(PIN_BOTONES[i]);
+    // Verificamos si el botón fue presionado
+    if (lectura == LOW && !pulsadoresPresionados[i] && (tiempoActual - ultimosTiemposPulsadores[i] > debounceDelay)) {
+      // Marcamos el botón como presionado
+      pulsadoresPresionados[i] = true;
+      // Actualizamos el tiempo de la última pulsación
+      ultimosTiemposPulsadores[i] = tiempoActual;
+      
+      // Verificar si la respuesta es correcta
+      respuestaCorrecta = ((ordenOpciones[i] + 1) == 1); // Asumiendo que la primera opción es siempre la correcta  
+      if (respuestaCorrecta) {
+        respuestasCorrectas++; // Incrementamos el contador de respuestas correctas
+      }   
+      estadoActual = REPRODUCCION_RESULTADO; // Cambiamos el estado a resultado
+      mezclarOrdenOpciones(); // Mezclamos las opciones para la siguiente pregunta
+      break; // Salimos del bucle
+    } else if (lectura == HIGH) {
+      // Si el botón no está presionado, lo marcamos como no presionado
+      pulsadoresPresionados[i] = false;
+    }
+  }
+}
+void manejarReproduccionResultado() {
+  // Verifica si no hay reproducción en curso y si no hay archivo de audio actual
+  if (!reproduccionEnCurso && archivoAudioActual.isEmpty()) {
+    // Asigna el archivo de audio según si la respuesta fue correcta o incorrecta
+    archivoAudioActual = respuestaCorrecta ? "/correcta.mp3" : "/incorrecta.mp3";
+  }
+}
+
+void manejarFinJuego() {
+  // Verifica si no hay reproducción en curso, no hay archivo de audio actual y no se ha reproducido el fin
+  if (!reproduccionEnCurso && archivoAudioActual.isEmpty() && !yaReprodujoFin) {
+    // Si todas las respuestas son correctas
+    if (respuestasCorrectas == preguntasPorJuego) {
+      archivoAudioActual = "/campeon.mp3"; // Asigna el audio de campeón
+      LedPWM(255, 255, 255); // LED blanco para campeón     
+    } 
+    // Si más del 70% de las respuestas son correctas
+    else if (respuestasCorrectas > preguntasPorJuego * 0.7) {
+      archivoAudioActual = "/ganador.mp3"; // Asigna el audio de ganador
+      LedPWM(255, 165, 0); // LED naranja para ganador      
+    } 
+    // Si menos del 70% de las respuestas son correctas
+    else {
+      archivoAudioActual = "/perdedor.mp3"; // Asigna el audio de perdedor
+      LedPWM(0, 0, 255); // LED azul para perdedor    
+    }
+    yaReprodujoFin = true; // Marca que ya se reprodujo el fin
+  } 
+  // Si no hay reproducción en curso
+  else if (!reproduccionEnCurso) {
+    delay(30000); // Espera 30 segundos
+    reiniciarJuego(); // Reinicia el juego
+  }
+}
+
+void reiniciarJuego() {
+  categoriaSeleccionada = -1; // Reinicia la categoría seleccionada
+  preguntaActual = 0; // Reinicia el contador de preguntas
+  respuestasCorrectas = 0; // Reinicia el contador de respuestas correctas
+  estadoActual = INTRODUCCION; // Vuelve al estado de introducción
+  LedPWM(0, 0, 0); // Apaga el LED
+  yaReprodujoFin = false; // Marca que no se ha reproducido el fin
+}
+
+void seleccionarPreguntasAleatorias() {
+  // Selecciona preguntas aleatorias para el juego
+  for (int i = 0; i < preguntasPorJuego; i++) {
+    bool preguntaUnica; // Variable para verificar si la pregunta es única
+    int nuevaPregunta; // Variable para almacenar la nueva pregunta
+    do {
+      nuevaPregunta = esp_random() % preguntasPorCategoria + 1; // Genera una nueva pregunta aleatoria
+      preguntaUnica = true; // Asume que la pregunta es única
+      // Verifica si la nueva pregunta ya fue seleccionada
+      for (int j = 0; j < i; j++) {
+        if (preguntasSeleccionadas[j] == nuevaPregunta) {
+          preguntaUnica = false; // Marca que la pregunta no es única
+          break; // Sale del bucle
+        }
+      }
+    } while (!preguntaUnica); // Repite hasta que se encuentre una pregunta única
+    preguntasSeleccionadas[i] = nuevaPregunta; // Almacena la pregunta seleccionada
+  }
+  mezclarOrdenOpciones(); // Mezcla el orden de las opciones
+}
+
+void mezclarOrdenOpciones() {
+  // Mezcla el orden de las opciones
+  for (int i = 0; i < totalCategorias; i++) {
+    ordenOpciones[i] = i; // Inicializa el orden de opciones
+  }
+  // Mezcla las opciones usando el algoritmo de Fisher-Yates
+  for (int i = totalCategorias - 1; i > 0; i--) {
+    int j = esp_random() % (i + 1); // Selecciona un índice aleatorio
+    int temp = ordenOpciones[i]; // Almacena el valor actual
+    ordenOpciones[i] = ordenOpciones[j]; // Intercambia los valores
+    ordenOpciones[j] = temp; // Completa el intercambio
+  }
+  return;  
+}
+
 void configurarLED() {
-  ledcSetup(CANAL_LEDC_0, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT); // Configura el canal LEDC 0
-  ledcSetup(CANAL_LEDC_1, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT); // Configura el canal LEDC 1
-  ledcSetup(CANAL_LEDC_2, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT); // Configura el canal LEDC 2
+  // Configura los canales de LED
+  ledcSetup(CANAL_LEDC_0, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT);
+  ledcSetup(CANAL_LEDC_1, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT);
+  ledcSetup(CANAL_LEDC_2, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT);
   
-  ledcAttachPin(PIN_LED_ROJO, CANAL_LEDC_0); // Asocia el pin del LED rojo al canal LEDC 0
-  ledcAttachPin(PIN_LED_VERDE, CANAL_LEDC_1); // Asocia el pin del LED verde al canal LEDC 1
-  ledcAttachPin(PIN_LED_AZUL, CANAL_LEDC_2); // Asocia el pin del LED azul al canal LEDC 2
+  // Asocia los pines de los LEDs a los canales
+  ledcAttachPin(PIN_LED_ROJO, CANAL_LEDC_0);
+  ledcAttachPin(PIN_LED_VERDE, CANAL_LEDC_1);
+  ledcAttachPin(PIN_LED_AZUL, CANAL_LEDC_2);
+}
+
+void configurarFuego() {
+  // Configura el canal para el fuego
+  ledcSetup(CANAL_LEDC_3, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT);
+  ledcAttachPin(PIN_FUEGO, CANAL_LEDC_3); // Asocia el pin del fuego al canal
 }
 
 void LedPWM(int rojo, int verde, int azul) {
-  ledcWrite(CANAL_LEDC_0, rojo); // Escribe el valor del LED rojo
-  ledcWrite(CANAL_LEDC_1, verde); // Escribe el valor del LED verde
-  ledcWrite(CANAL_LEDC_2, azul); // Escribe el valor del LED azul
+  // Escribe los valores de PWM para cada color
+  ledcWrite(CANAL_LEDC_0, rojo);
+  ledcWrite(CANAL_LEDC_1, verde);
+  ledcWrite(CANAL_LEDC_2, azul);
+}
+
+void moverFuego() {
+  unsigned long tiempoActual = millis(); // Obtiene el tiempo actual
+  // Verifica si ha pasado el intervalo para mover el fuego
+  if (tiempoActual - ultimoMovimientoFuego >= intervaloMovimientoFuego) {
+    ultimoMovimientoFuego = tiempoActual; // Actualiza el último movimiento
+    int velocidadFuego = random(velocidadMinimaFuego, velocidadMaximaFuego); // Genera una velocidad aleatoria
+    ledcWrite(CANAL_LEDC_3, velocidadFuego); // Escribe la velocidad en el canal del fuego
+  }
 }
 
 void iniciarOTA() {
-  WiFi.mode(WIFI_STA); // Configura el modo WiFi como estación
-  WiFi.begin(ssid, password); // Inicia la conexión WiFi con el SSID y la contraseña
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) { // Espera a que se conecte
-    Serial.println("Conexión fallida! Reiniciando..."); // Mensaje de error si la conexión falla
-    delay(5000); // Espera 5 segundos antes de reiniciar
-    ESP.restart(); // Reinicia el ESP
+  WiFi.mode(WIFI_STA); // Configura el modo WiFi
+  WiFi.begin(ssid, password); // Inicia la conexión WiFi
+  // Espera hasta que se conecte
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println("Conexión fallida! Reiniciando..."); // Mensaje de error
+    delay(10000); // Espera 10 segundos
+    ESP.restart(); // Reinicia el ESP (comentado)
   }
 
-  ArduinoOTA.setHostname("ESP32-TriviaMagos"); // Establece el nombre del host para OTA
-  ArduinoOTA.begin(); // Inicia el proceso de OTA
-}
-void configurarFuego() {
-  ledcSetup(CANAL_LEDC_3, FRECUENCIA_BASE_LEDC, LEDC_TIMER_8_BIT); // Configura el canal LEDC 3 para el ventilador fuego
-  ledcAttachPin(PIN_FUEGO, CANAL_LEDC_2); // Asocia el pin del LED azul al canal LEDC 2
-}
-/// @brief Función que controla y simula el movimiento aleatorio del fuego.
-///Esta función es encargada de mover simular un efecto de fuego en el circuito. El movimiento del 'fuego' se realiza
-///a través de una variación aleatoria de la velocidad de un ventilador, lo que puede simular diferentes intensidades
-///y patrones de movimiento del fuego.
-///@details La función utiliza la función millis() para obtener el tiempo actual en milisegundos. Si ha transcurrido
-///un tiempo específico (intervaloMovimientoFuego), se genera una velocidad aleatoria (entre mapeoIni y mapeofin) que
-///se utiliza para controlar la velocidad del ventilador. Este valor es mapeado a un rango de velocidad válido para el
-///ventilador y luego escrito en el canal del LEDC correspondiente.
+  ArduinoOTA.setHostname("ESP32-Trivia"); // Establece el nombre del host para OTA
+  ArduinoOTA
+    .onStart([]() { // Callback al iniciar la actualización
+      String type; // Variable para el tipo de actualización
+      if (ArduinoOTA.getCommand() == U_FLASH)
+        type = "sketch"; // Si es un sketch
+      else // U_SPIFFS
+        type = "filesystem"; // Si es el sistema de archivos
 
-void moverFuego() {
-  unsigned long tiempoActual = millis(); // Obtiene el tiempo actual en milisegundos
-  int mapeoIni = 144;
-  int mapeofin = 244;
-  if (tiempoActual - ultimoMovimientoFuego >= intervaloMovimientoFuego) { // Verifica si ha pasado el intervalo
-  int velocidad = aleatorioTRNG(mapeoIni, mapeofin); // Genera un cambio de velocidad aleatorio para simular un movimiento de fuego
-    int velocidadMap = map(velocidad, mapeoIni, mapeofin, velocidadMaximaFuego, velocidadMinimaFuego);
-       ledcWrite(CANAL_LEDC_3, velocidadMap); // Escribe el valor de la velocidad del ventilador de Fuego
-    ultimoMovimientoFuego = tiempoActual; // Actualiza el tiempo del último movimiento
-  }
-}
-
-
-// Función para generar un número aleatorio de alta entropía en un rango específico
-long aleatorioTRNG(long minimo, long maximo) {
-  if (minimo >= maximo) {
-    // Si el mínimo es mayor o igual al máximo, devolvemos el mínimo
-    return minimo;
-  }
-  unsigned long rango = maximo - minimo + 1;// Calculamos el rango
-        uint32_t numeroAleatorio = esp_random();// Obtenemos un número aleatorio de 32 bits usando esp_esp_random()
-    return (numeroAleatorio % rango) + minimo; // Ajustamos el número aleatorio al rango deseado y sumamos el mínimo
+      // NOTE: si se actualiza SPIFFS, este sería el lugar para desmontar SPIFFS usando SPIFFS.end()
+      Serial.println("Start updating " + type); // Mensaje de inicio de actualización
+    })
+    .onEnd([]() { // Callback al finalizar la actualización
+      Serial.println("\nEnd"); // Mensaje de fin
+    })
+    .onProgress([](unsigned int progress, unsigned int total) { // Callback para el progreso
+      Serial.printf("Progress: %u%%\r", (progress / (total / 100))); // Muestra el progreso
+    })
+    .onError([](ota_error_t error) { // Callback para errores
+      Serial.printf("Error[%u]: ", error); // Muestra el error
+      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed"); // Error de autenticación
+      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed"); // Error al iniciar
+      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed"); // Error de conexión
+      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed"); // Error de recepción
+      else if (error == OTA_END_ERROR) Serial.println("End Failed"); // Error al finalizar
+    });;
+  
+  ArduinoOTA.begin(); // Inicia el proceso OTA
+  Serial.println("OTA Listo"); // Mensaje de que OTA está listo
+  Serial.print("Dirección IP: "); // Muestra la dirección IP
+  Serial.println(WiFi.localIP()); // Imprime la dirección IP local
 }
