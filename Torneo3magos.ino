@@ -23,11 +23,11 @@ const char *version = "1.06"; // Versión del programa actualizada
 #define PIN_BOTON_4 34 // Pin para el cuarto botón
 
 // Definición de pin para el motor Ventilador
-#define PIN_FUEGO 13 // Pin para controlar el motor del ventilador
+#define PIN_FUEGO 12 // Pin para controlar el motor del ventilador
 #define CANAL_LEDC_3 3 // Canal LEDC para el control del ventilador
 
 // Definición de pines para LED RGB
-#define PIN_LED_ROJO 33 // Pin para el LED rojo
+#define PIN_LED_ROJO 13 // Pin para el LED rojo
 #define PIN_LED_VERDE 14 // Pin para el LED verde
 #define PIN_LED_AZUL 27 // Pin para el LED azul
 
