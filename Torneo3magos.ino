@@ -1,6 +1,8 @@
-const char *version = "1.06"; // Versión del programa actualizada
+const char *version = "1.07"; // Versión del programa actualizada
 // Se quito la configuración OTA ya que no se utiliza wifi. 
 // Inclusión de librerías necesarias
+// Se agrega encendido de LED RGB en color Cyan o turqueza (ver en código) hasta que llegue al resultado
+
 #include "AudioFileSourceSD.h" // Librería para manejar archivos de audio desde la tarjeta SD
 #include "AudioGeneratorMP3.h" // Librería para generar audio en formato MP3
 #include "AudioOutputI2SNoDAC.h" // Librería para salida de audio I2S sin DAC
@@ -69,6 +71,10 @@ unsigned long ultimoMovimientoFuego = 0; // Último tiempo de movimiento del fue
 const int intervaloMovimientoFuego = 200; // Intervalo entre movimientos del fuego
 const int velocidadMaximaFuego = 144; // Velocidad máxima del fuego
 const int velocidadMinimaFuego = 254; // Velocidad mínima del fuego
+unsigned long ultimoCambioLED = 0;
+const int intervaloCambioLED = 1000; // 1 segundo
+
+
 
 // Enumeración para el manejo de estados del juego
 // Estado inicial donde se presenta el juego al usuario
@@ -132,7 +138,7 @@ void setup() {
 void loop() {
   yield(); // Permite que otras tareas se ejecuten, evitando que el programa se congele
   moverFuego(); // Actualización del movimiento del fuego
-
+  actualizarLEDCian(); // Actualización del brillo del led RGB para que se ponga turqueza en las preguntas hasta antes del resultado 
   // Máquina de estados para el manejo del juego
   switch (estadoActual) {
     case INTRODUCCION: // Estado de introducción del juego
@@ -471,5 +477,16 @@ void moverFuego() {
     ultimoMovimientoFuego = tiempoActual; // Actualiza el último movimiento
     int velocidadFuego = random(velocidadMinimaFuego, velocidadMaximaFuego); // Genera una velocidad aleatoria
     ledcWrite(CANAL_LEDC_3, velocidadFuego); // Escribe la velocidad en el canal del fuego
+  }
+}
+void actualizarLEDCian() {
+  unsigned long tiempoActual = millis();
+  if (tiempoActual - ultimoCambioLED >= intervaloCambioLED) {
+    ultimoCambioLED = tiempoActual;
+    if (estadoActual == REPRODUCCION_PREGUNTA || estadoActual == REPRODUCCION_OPCIONES || estadoActual == ESPERA_RESPUESTA) {
+      int brillo = random(77, 256); // 30% a 100% de 255
+      //LedPWM(0, brillo, brillo); // Turquesa (0, 255, 255) con brillo variable
+	  LedPWM(0, brillo, 255); // Cian (0, x, 255) con brillo variable solo en verde
+    }
   }
 }
